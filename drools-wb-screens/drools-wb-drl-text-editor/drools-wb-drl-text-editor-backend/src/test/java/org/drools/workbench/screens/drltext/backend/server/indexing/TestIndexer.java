@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 JBoss Inc
+ * Copyright 2014 JBoss, by Red Hat, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.drools.workbench.screens.drltext.backend.server;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Produces;
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.drools.workbench.screens.drltext.backend.server.indexing;
 
 import org.uberfire.io.IOService;
-import org.uberfire.io.impl.IOServiceDotFileImpl;
+import org.uberfire.metadata.engine.Indexer;
+import org.uberfire.workbench.type.ResourceTypeDefinition;
 
-@Singleton
-public class TestAppSetup {
+public interface TestIndexer<T extends ResourceTypeDefinition> extends Indexer {
 
-    private final IOService ioService = new IOServiceDotFileImpl();
+    /**
+     * Mock CDI injection of IOService
+     * @param ioService
+     */
+    void setIOService( final IOService ioService );
 
-    @PostConstruct
-    public void onStartup() {
-    }
-
-    @Produces
-    @Named("ioStrategy")
-    public IOService ioService() {
-        return ioService;
-    }
+    /**
+     * Mock CDI injection of ResourceTypeDefinition
+     * @param type
+     */
+    void setResourceTypeDefinition( final T type );
 
 }
