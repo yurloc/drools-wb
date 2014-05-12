@@ -30,6 +30,9 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
 import org.junit.Test;
+import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
+import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
+import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
@@ -49,7 +52,7 @@ public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<DRLReso
 
         //Add test files
         final Path path = basePath.resolve( "drl1.drl" );
-        final String drl = loadDrl( "drl1.drl" );
+        final String drl = loadText( "drl1.drl" );
         ioService().write( path,
                            drl );
 

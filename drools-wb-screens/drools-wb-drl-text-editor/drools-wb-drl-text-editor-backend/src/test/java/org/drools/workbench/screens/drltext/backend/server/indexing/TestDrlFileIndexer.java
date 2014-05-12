@@ -18,6 +18,7 @@ package org.drools.workbench.screens.drltext.backend.server.indexing;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
+import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.uberfire.io.IOService;
 
 /**

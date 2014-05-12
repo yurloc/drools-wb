@@ -32,6 +32,9 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
 import org.junit.Test;
+import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
+import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
+import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
@@ -53,11 +56,11 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
 
         //Add test files
         final Path path1 = basePath.resolve( "drl3.drl" );
-        final String drl1 = loadDrl( "drl3.drl" );
+        final String drl1 = loadText( "drl3.drl" );
         ioService().write( path1,
                            drl1 );
         final Path path2 = basePath.resolve( "drl4.drl" );
-        final String drl2 = loadDrl( "drl4.drl" );
+        final String drl2 = loadText( "drl4.drl" );
         ioService().write( path2,
                            drl2 );
 
