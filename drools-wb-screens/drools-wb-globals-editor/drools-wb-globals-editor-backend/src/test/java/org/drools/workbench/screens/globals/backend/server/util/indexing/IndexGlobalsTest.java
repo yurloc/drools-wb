@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.workbench.screens.drltext.backend.server.indexing;
+package org.drools.workbench.screens.globals.backend.server.util.indexing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
+import org.drools.workbench.screens.globals.type.GlobalResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -45,22 +45,22 @@ import org.uberfire.metadata.model.KObject;
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceTypeDefinition> {
+public class IndexGlobalsTest extends BaseIndexingTest<GlobalResourceTypeDefinition> {
 
     @Test
-    public void testIndexingDrlRuleMultipleTypesResources() throws IOException, InterruptedException {
+    public void testIndexingGlobalResources() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
                            "<none>" );
 
         //Add test files
-        final Path path1 = basePath.resolve( "drl3.drl" );
-        final String drl1 = loadText( "drl3.drl" );
+        final Path path1 = basePath.resolve( "global1.gdrl" );
+        final String drl1 = loadText( "global1.gdrl" );
         ioService().write( path1,
                            drl1 );
-        final Path path2 = basePath.resolve( "drl4.drl" );
-        final String drl2 = loadText( "drl4.drl" );
+        final Path path2 = basePath.resolve( "global2.gdrl" );
+        final String drl2 = loadText( "global2.gdrl" );
         ioService().write( path2,
                            drl2 );
 
@@ -75,7 +75,7 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
 
             final BooleanQuery query = new BooleanQuery();
             query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.kie.workbench.common.services.refactoring.backend.server.classes.applicant" ) ),
+                                                "java.util.arraylist" ) ),
                        BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
@@ -93,40 +93,12 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
                             path2 );
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
-
         }
-
-        {
-            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
-                                                                                true );
-
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.kie.workbench.common.services.refactoring.backend.server.classes.mortgage" ) ),
-                       BooleanClause.Occur.MUST );
-            searcher.search( query,
-                             collector );
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            assertEquals( 1,
-                          hits.length );
-
-            final List<KObject> results = new ArrayList<KObject>();
-            for ( int i = 0; i < hits.length; i++ ) {
-                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
-            }
-            assertContains( results,
-                            path2 );
-
-            ( (LuceneIndex) index ).nrtRelease( searcher );
-
-        }
-
     }
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestDrlFileIndexer();
+        return new TestGlobalsFileIndexer();
     }
 
     @Override
@@ -138,8 +110,8 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
     }
 
     @Override
-    protected DRLResourceTypeDefinition getResourceTypeDefinition() {
-        return new DRLResourceTypeDefinition();
+    protected GlobalResourceTypeDefinition getResourceTypeDefinition() {
+        return new GlobalResourceTypeDefinition();
     }
 
     @Override

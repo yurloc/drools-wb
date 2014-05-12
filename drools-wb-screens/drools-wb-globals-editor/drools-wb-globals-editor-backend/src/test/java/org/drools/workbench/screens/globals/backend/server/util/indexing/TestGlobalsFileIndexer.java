@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.workbench.screens.drltext.backend.server.indexing;
+package org.drools.workbench.screens.globals.backend.server.util.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
+import org.drools.workbench.screens.globals.backend.server.indexing.GlobalsFileIndexer;
+import org.drools.workbench.screens.globals.type.GlobalResourceTypeDefinition;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.uberfire.io.IOService;
 
@@ -25,7 +26,7 @@ import org.uberfire.io.IOService;
  * Test indexer
  */
 @ApplicationScoped
-public class TestDrlFileIndexer extends DrlFileIndexer implements TestIndexer<DRLResourceTypeDefinition> {
+public class TestGlobalsFileIndexer extends GlobalsFileIndexer implements TestIndexer<GlobalResourceTypeDefinition> {
 
     @Override
     public void setIOService( final IOService ioService ) {
@@ -33,8 +34,8 @@ public class TestDrlFileIndexer extends DrlFileIndexer implements TestIndexer<DR
     }
 
     @Override
-    public void setResourceTypeDefinition( final DRLResourceTypeDefinition type ) {
-        this.drlType = type;
+    public void setResourceTypeDefinition( final GlobalResourceTypeDefinition type ) {
+        this.type = type;
     }
 
 }

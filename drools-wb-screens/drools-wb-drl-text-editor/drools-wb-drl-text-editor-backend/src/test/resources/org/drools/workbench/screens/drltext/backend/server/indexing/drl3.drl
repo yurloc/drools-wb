@@ -1,4 +1,4 @@
-package org.kie.workbench.common.services.refactoring.backend.server.classes;
+package org.drools.workbench.screens.drltext.backend.server.indexing.classes;
 
 rule "myRule1"
 ruleflow-group "myRuleFlowGroup"
