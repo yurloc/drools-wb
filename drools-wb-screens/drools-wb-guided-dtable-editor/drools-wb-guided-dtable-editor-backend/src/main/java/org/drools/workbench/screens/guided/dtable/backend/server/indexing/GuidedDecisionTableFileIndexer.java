@@ -38,9 +38,9 @@ import org.uberfire.metadata.model.KObject;
 import org.uberfire.metadata.model.KObjectKey;
 
 @ApplicationScoped
-public class GuidedDecisionTableIndexer implements Indexer {
+public class GuidedDecisionTableFileIndexer implements Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger( GuidedDecisionTableIndexer.class );
+    private static final Logger logger = LoggerFactory.getLogger( GuidedDecisionTableFileIndexer.class );
 
     @Inject
     @Named("ioStrategy")

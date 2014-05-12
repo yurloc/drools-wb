@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
 public class IndexGuidedDecisionTableActionsTest extends BaseIndexingTest<GuidedDTableResourceTypeDefinition> {
 
     @Test
-    @Ignore("GuidedDecisionTableIndexer's use of PackageDescrVisitor doesn't support RHS sections yet")
+    @Ignore("GuidedDecisionTableFileIndexer's use of PackageDescrVisitor doesn't support RHS sections yet")
     public void testIndexGuidedDecisionTableActions() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
@@ -103,7 +103,7 @@ public class IndexGuidedDecisionTableActionsTest extends BaseIndexingTest<Guided
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestGuidedDecisionTableIndexer();
+        return new TestGuidedDecisionTableFileIndexer();
     }
 
     @Override

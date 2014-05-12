@@ -25,7 +25,7 @@ import org.uberfire.io.IOService;
  * Test indexer
  */
 @ApplicationScoped
-public class TestGuidedDecisionTableIndexer extends GuidedDecisionTableIndexer implements TestIndexer<GuidedDTableResourceTypeDefinition> {
+public class TestGuidedDecisionTableFileIndexer extends GuidedDecisionTableFileIndexer implements TestIndexer<GuidedDTableResourceTypeDefinition> {
 
     @Override
     public void setIOService( final IOService ioService ) {

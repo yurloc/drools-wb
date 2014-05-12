@@ -101,7 +101,7 @@ public class IndexGuidedDecisionTableConditionsTest extends BaseIndexingTest<Gui
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestGuidedDecisionTableIndexer();
+        return new TestGuidedDecisionTableFileIndexer();
     }
 
     @Override
