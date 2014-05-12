@@ -19,14 +19,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.drools.compiler.compiler.DrlParser;
-import org.drools.compiler.lang.descr.PackageDescr;
-import org.drools.workbench.models.guided.dtable.backend.GuidedDTDRLPersistence;
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.screens.guided.dtable.type.GuidedDTableResourceTypeDefinition;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
-import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,20 +57,11 @@ public class GuidedDecisionTableFileIndexer implements Indexer {
         try {
             final String content = ioService.readAllString( path );
             final GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal( content );
-            final String drl = GuidedDTDRLPersistence.getInstance().marshal( model );
-
-            final DrlParser drlParser = new DrlParser();
-            final PackageDescr packageDescr = drlParser.parse( true,
-                                                               drl );
-            if ( packageDescr == null ) {
-                logger.error( "Unable to parse DRL for '" + path.toUri().toString() + "'." );
-                return index;
-            }
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-            final PackageDescrVisitor packageDescrVisitor = new PackageDescrVisitor( builder,
-                                                                                     packageDescr );
-            packageDescrVisitor.visit();
+            final GuidedDecisionTableModelIndexVisitor visitor = new GuidedDecisionTableModelIndexVisitor( builder,
+                                                                                                           model );
+            visitor.visit();
 
             index = KObjectUtil.toKObject( path,
                                            builder.build() );

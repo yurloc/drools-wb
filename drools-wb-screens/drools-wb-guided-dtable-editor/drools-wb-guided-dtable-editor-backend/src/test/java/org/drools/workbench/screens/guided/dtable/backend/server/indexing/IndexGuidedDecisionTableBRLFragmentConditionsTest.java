@@ -48,10 +48,10 @@ import org.uberfire.metadata.model.KObject;
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexGuidedDecisionTableConditionsTest extends BaseIndexingTest<GuidedDTableResourceTypeDefinition> {
+public class IndexGuidedDecisionTableBRLFragmentConditionsTest extends BaseIndexingTest<GuidedDTableResourceTypeDefinition> {
 
     @Test
-    public void testIndexGuidedDecisionTableConditions() throws IOException, InterruptedException {
+    public void testIndexGuidedDecisionTableBRLFragmentConditions() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
@@ -59,12 +59,12 @@ public class IndexGuidedDecisionTableConditionsTest extends BaseIndexingTest<Gui
 
         //Add test files
         final Path path = basePath.resolve( "dtable1.gdst" );
-        final GuidedDecisionTable52 model = GuidedDecisionTableFactory.makeTableWithConditionCol( "org.drools.workbench.screens.guided.dtable.backend.server.indexing",
-                                                                                                  new ArrayList<Import>() {{
-                                                                                                      add( new Import( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Applicant" ) );
-                                                                                                      add( new Import( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Mortgage" ) );
-                                                                                                  }},
-                                                                                                  "dtable1" );
+        final GuidedDecisionTable52 model = GuidedDecisionTableFactory.makeTableWithBRLFragmentConditionCol( "org.drools.workbench.screens.guided.dtable.backend.server.indexing",
+                                                                                                             new ArrayList<Import>() {{
+                                                                                                                 add( new Import( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Applicant" ) );
+                                                                                                                 add( new Import( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Mortgage" ) );
+                                                                                                             }},
+                                                                                                             "dtable1" );
         final String xml = GuidedDTXMLPersistence.getInstance().marshal( model );
         ioService().write( path,
                            xml );

@@ -35,7 +35,7 @@ import org.guvnor.common.services.backend.file.FileDiscoveryService;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.workbench.common.services.backend.file.DSLFileFilter;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
-import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrVisitor;
+import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,9 +88,9 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
             }
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-            final PackageDescrVisitor packageDescrVisitor = new PackageDescrVisitor( builder,
-                                                                                     packageDescr );
-            packageDescrVisitor.visit();
+            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+                                                                                   packageDescr );
+            visitor.visit();
 
             index = KObjectUtil.toKObject( path,
                                            builder.build() );

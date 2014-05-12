@@ -34,7 +34,6 @@ import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.screens.guided.dtable.type.GuidedDTableResourceTypeDefinition;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -52,7 +51,6 @@ import static org.junit.Assert.*;
 public class IndexGuidedDecisionTableActionsTest extends BaseIndexingTest<GuidedDTableResourceTypeDefinition> {
 
     @Test
-    @Ignore("GuidedDecisionTableFileIndexer's use of PackageDescrVisitor doesn't support RHS sections yet")
     public void testIndexGuidedDecisionTableActions() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );

@@ -23,7 +23,7 @@ import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
-import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrVisitor;
+import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +66,9 @@ public class GuidedRuleDrlFileIndexer implements Indexer {
             }
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-            final PackageDescrVisitor packageDescrVisitor = new PackageDescrVisitor( builder,
-                                                                                     packageDescr );
-            packageDescrVisitor.visit();
+            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+                                                                                   packageDescr );
+            visitor.visit();
 
             index = KObjectUtil.toKObject( path,
                                            builder.build() );
