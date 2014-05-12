@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
 public class IndexGlobalsTest extends BaseIndexingTest<GlobalResourceTypeDefinition> {
 
     @Test
-    public void testIndexingGlobalResources() throws IOException, InterruptedException {
+    public void testIndexGlobals() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),

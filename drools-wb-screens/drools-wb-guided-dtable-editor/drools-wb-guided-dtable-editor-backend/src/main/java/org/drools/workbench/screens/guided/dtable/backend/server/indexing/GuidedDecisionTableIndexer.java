@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.workbench.screens.globals.backend.server.indexing;
+package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,7 +21,10 @@ import javax.inject.Named;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
-import org.drools.workbench.screens.globals.type.GlobalResourceTypeDefinition;
+import org.drools.workbench.models.guided.dtable.backend.GuidedDTDRLPersistence;
+import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
+import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
+import org.drools.workbench.screens.guided.dtable.type.GuidedDTableResourceTypeDefinition;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
@@ -35,16 +38,16 @@ import org.uberfire.metadata.model.KObject;
 import org.uberfire.metadata.model.KObjectKey;
 
 @ApplicationScoped
-public class GlobalsFileIndexer implements Indexer {
+public class GuidedDecisionTableIndexer implements Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger( GlobalsFileIndexer.class );
+    private static final Logger logger = LoggerFactory.getLogger( GuidedDecisionTableIndexer.class );
 
     @Inject
     @Named("ioStrategy")
     protected IOService ioService;
 
     @Inject
-    protected GlobalResourceTypeDefinition type;
+    protected GuidedDTableResourceTypeDefinition type;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -56,7 +59,10 @@ public class GlobalsFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String drl = ioService.readAllString( path );
+            final String content = ioService.readAllString( path );
+            final GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal( content );
+            final String drl = GuidedDTDRLPersistence.getInstance().marshal( model );
+
             final DrlParser drlParser = new DrlParser();
             final PackageDescr packageDescr = drlParser.parse( true,
                                                                drl );

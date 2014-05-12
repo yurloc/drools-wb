@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package org.drools.workbench.screens.drltext.backend.server.indexing;
+package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
+import org.drools.workbench.models.datamodel.imports.Import;
+import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
+import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
+import org.drools.workbench.screens.guided.dtable.type.GuidedDTableResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -34,25 +41,32 @@ import org.kie.workbench.common.services.refactoring.backend.server.indexing.Rul
 import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
+import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
 import org.uberfire.metadata.engine.Index;
+import org.uberfire.metadata.model.KObject;
 
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexRuleAttributeNameTest extends BaseIndexingTest<DRLResourceTypeDefinition> {
+public class IndexGuidedDecisionTableAttributesTest extends BaseIndexingTest<GuidedDTableResourceTypeDefinition> {
 
     @Test
-    public void testIndexDrlRuleAttributeNames() throws IOException, InterruptedException {
+    public void testIndexGuidedDecisionTableAttributes() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
                            "<none>" );
 
         //Add test files
-        final Path path = basePath.resolve( "drl1.drl" );
-        final String drl = loadText( "drl1.drl" );
+        final Path path = basePath.resolve( "dtable1.gdst" );
+        final GuidedDecisionTable52 model = GuidedDecisionTableFactory.makeTableWithAttributeCol( "org.drools.workbench.screens.guided.dtable.backend.server.indexing",
+                                                                                                  new ArrayList<Import>() {{
+                                                                                                      add( new Import( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Applicant" ) );
+                                                                                                  }},
+                                                                                                  "dtable1" );
+        final String xml = GuidedDTXMLPersistence.getInstance().marshal( model );
         ioService().write( path,
-                           drl );
+                           xml );
 
         Thread.sleep( 5000 ); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
 
@@ -63,22 +77,30 @@ public class IndexRuleAttributeNameTest extends BaseIndexingTest<DRLResourceType
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
 
-            searcher.search( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
-                                                      "ruleflow-group" ) ),
+            final BooleanQuery query = new BooleanQuery();
+            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+                                                "ruleflow-group" ) ),
+                       BooleanClause.Occur.MUST );
+            searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
             assertEquals( 1,
                           hits.length );
 
-            ( (LuceneIndex) index ).nrtRelease( searcher );
+            final List<KObject> results = new ArrayList<KObject>();
+            for ( int i = 0; i < hits.length; i++ ) {
+                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
+            }
+            assertContains( results,
+                            path );
 
+            ( (LuceneIndex) index ).nrtRelease( searcher );
         }
     }
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestDrlFileIndexer();
+        return new TestGuidedDecisionTableIndexer();
     }
 
     @Override
@@ -90,8 +112,8 @@ public class IndexRuleAttributeNameTest extends BaseIndexingTest<DRLResourceType
     }
 
     @Override
-    protected DRLResourceTypeDefinition getResourceTypeDefinition() {
-        return new DRLResourceTypeDefinition();
+    protected GuidedDTableResourceTypeDefinition getResourceTypeDefinition() {
+        return new GuidedDTableResourceTypeDefinition();
     }
 
     @Override

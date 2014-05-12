@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
 public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceTypeDefinition> {
 
     @Test
-    public void testIndexingDrlRuleMultipleTypesResources() throws IOException, InterruptedException {
+    public void testIndexDrlRuleMultipleTypes() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
@@ -75,7 +75,7 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
 
             final BooleanQuery query = new BooleanQuery();
             query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.kie.workbench.common.services.refactoring.backend.server.classes.applicant" ) ),
+                                                "org.drools.workbench.screens.drltext.backend.server.indexing.classes.applicant" ) ),
                        BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
@@ -103,7 +103,7 @@ public class IndexRuleMultipleTypesTest extends BaseIndexingTest<DRLResourceType
 
             final BooleanQuery query = new BooleanQuery();
             query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.kie.workbench.common.services.refactoring.backend.server.classes.mortgage" ) ),
+                                                "org.drools.workbench.screens.drltext.backend.server.indexing.classes.mortgage" ) ),
                        BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
