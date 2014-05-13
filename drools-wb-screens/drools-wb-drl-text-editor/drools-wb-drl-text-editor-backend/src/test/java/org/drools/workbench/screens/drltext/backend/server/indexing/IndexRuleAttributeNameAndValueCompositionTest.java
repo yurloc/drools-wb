@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.drools.workbench.screens.guided.rule.backend.server.indexing;
+package org.drools.workbench.screens.drltext.backend.server.indexing;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -28,7 +30,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
+import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -36,23 +38,25 @@ import org.kie.workbench.common.services.refactoring.backend.server.indexing.Rul
 import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
+import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
 import org.uberfire.metadata.engine.Index;
+import org.uberfire.metadata.model.KObject;
 
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<GuidedRuleDRLResourceTypeDefinition> {
+public class IndexRuleAttributeNameAndValueCompositionTest extends BaseIndexingTest<DRLResourceTypeDefinition> {
 
     @Test
-    public void testIndexDrlRuleAttributeNameAndValues() throws IOException, InterruptedException {
+    public void testIndexDrlRuleAttributeNameAndValueComposition() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
                            "<none>" );
 
         //Add test files
-        final Path path = basePath.resolve( "drl1.rdrl" );
-        final String drl = loadText( "drl1.rdrl" );
+        final Path path = basePath.resolve( "drl5.drl" );
+        final String drl = loadText( "drl5.drl" );
         ioService().write( path,
                            drl );
 
@@ -60,60 +64,57 @@ public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<GuidedR
 
         final Index index = getConfig().getIndexManager().get( org.uberfire.metadata.io.KObjectUtil.toKCluster( basePath.getFileSystem() ) );
 
+        //DRL defining a RuleFlow-Group named myRuleFlowGroup. This should match drl5.drl
+        //This checks whether there is a Rule Attribute "ruleflow-group" and its Value is "myRuleflowGroup"
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
 
             final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
-                                                "ruleflow-group" ) ),
-                       BooleanClause.Occur.MUST );
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
-                                                "nonexistent" ) ),
-                       BooleanClause.Occur.MUST );
-            searcher.search( query,
-                             collector );
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
-            assertEquals( 0,
-                          hits.length );
-
-            ( (LuceneIndex) index ).nrtRelease( searcher );
-
-        }
-
-        //This simply checks whether there is a Rule Attribute "ruleflow-group" and a Rule Attribute Value "myRuleflowGroup"
-        //The specific query does not check that the Rule Attribute Value corresponds to the Rule Attribute, so it is possible
-        //that the value relates to a different Rule Attribute.
-        {
-            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
-                                                                                true );
-
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
-                                                "ruleflow-group" ) ),
-                       BooleanClause.Occur.MUST );
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
+            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString() + ":ruleflow-group:" + IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
                                                 "myruleflowgroup" ) ),
                        BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
             assertEquals( 1,
                           hits.length );
 
-            ( (LuceneIndex) index ).nrtRelease( searcher );
+            final List<KObject> results = new ArrayList<KObject>();
+            for ( int i = 0; i < hits.length; i++ ) {
+                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
+            }
+            assertContains( results,
+                            path );
 
+            ( (LuceneIndex) index ).nrtRelease( searcher );
+        }
+
+        //DRL defining a RuleFlow-Group named myAgendaGroup. This should *NOT* match drl5.drl
+        {
+            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
+            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
+                                                                                true );
+
+            final BooleanQuery query = new BooleanQuery();
+            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString() + ":ruleflow-group:" + IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
+                                                "myagendagroup" ) ),
+                       BooleanClause.Occur.MUST );
+            searcher.search( query,
+                             collector );
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            assertEquals( 0,
+                          hits.length );
+
+            ( (LuceneIndex) index ).nrtRelease( searcher );
         }
 
     }
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestGuidedRuleDrlFileIndexer();
+        return new TestDrlFileIndexer();
     }
 
     @Override
@@ -125,8 +126,8 @@ public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<GuidedR
     }
 
     @Override
-    protected GuidedRuleDRLResourceTypeDefinition getResourceTypeDefinition() {
-        return new GuidedRuleDRLResourceTypeDefinition();
+    protected DRLResourceTypeDefinition getResourceTypeDefinition() {
+        return new DRLResourceTypeDefinition();
     }
 
     @Override

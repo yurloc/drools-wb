@@ -98,6 +98,33 @@ public class IndexGuidedRuleTemplateAttributesTest extends BaseIndexingTest<Guid
             ( (LuceneIndex) index ).nrtRelease( searcher );
         }
 
+        //Rule Template defining a RuleFlow-Group named myRuleFlowGroup. This should match template1.template
+        //This checks whether there is a Rule Attribute "ruleflow-group" and its Value is "myRuleflowGroup"
+        {
+            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
+            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
+                                                                                true );
+
+            final BooleanQuery query = new BooleanQuery();
+            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString() + ":ruleflow-group:" + IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
+                                                "myruleflowgroup" ) ),
+                       BooleanClause.Occur.MUST );
+            searcher.search( query,
+                             collector );
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            assertEquals( 1,
+                          hits.length );
+
+            final List<KObject> results = new ArrayList<KObject>();
+            for ( int i = 0; i < hits.length; i++ ) {
+                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
+            }
+            assertContains( results,
+                            path );
+
+            ( (LuceneIndex) index ).nrtRelease( searcher );
+        }
+
     }
 
     @Override

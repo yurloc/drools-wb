@@ -16,6 +16,7 @@
 package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.drools.workbench.models.datamodel.imports.Import;
@@ -31,6 +32,7 @@ import org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn
 import org.drools.workbench.models.guided.dtable.shared.model.BaseColumn;
 import org.drools.workbench.models.guided.dtable.shared.model.CompositeColumn;
 import org.drools.workbench.models.guided.dtable.shared.model.ConditionCol52;
+import org.drools.workbench.models.guided.dtable.shared.model.DTCellValue52;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.models.guided.dtable.shared.model.Pattern52;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
@@ -100,8 +102,14 @@ public class GuidedDecisionTableModelIndexVisitor {
     }
 
     private void visit( final AttributeCol52 o ) {
-        builder.addRuleAttribute( new RuleAttribute( o.getAttribute(),
-                                                     o.getDefaultValueAsString() ) );
+        final int iCol = model.getExpandedColumns().indexOf( o );
+        for ( List<DTCellValue52> row : model.getData() ) {
+            final String attributeValue = row.get( iCol ).getStringValue();
+            if ( !( attributeValue == null || attributeValue.isEmpty() ) ) {
+                builder.addRuleAttribute( new RuleAttribute( o.getAttribute(),
+                                                             attributeValue ) );
+            }
+        }
     }
 
     private void visit( final Pattern52 o ) {

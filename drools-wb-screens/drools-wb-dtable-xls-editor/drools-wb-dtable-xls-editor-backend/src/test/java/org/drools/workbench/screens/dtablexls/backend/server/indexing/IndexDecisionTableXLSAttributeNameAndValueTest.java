@@ -67,6 +67,9 @@ public class IndexDecisionTableXLSAttributeNameAndValueTest extends BaseIndexing
 
         final Index index = getConfig().getIndexManager().get( org.uberfire.metadata.io.KObjectUtil.toKCluster( basePath.getFileSystem() ) );
 
+        //This simply checks whether there is a Rule Attribute "ruleflow-group" and a Rule Attribute Value "myRuleflowGroup"
+        //The specific query does not check that the Rule Attribute Value corresponds to the Rule Attribute, so it is possible
+        //that the value relates to a different Rule Attribute.
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,

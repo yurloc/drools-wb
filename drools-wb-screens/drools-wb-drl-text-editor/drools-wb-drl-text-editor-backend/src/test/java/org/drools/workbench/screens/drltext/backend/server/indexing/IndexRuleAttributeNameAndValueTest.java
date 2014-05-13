@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
 public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<DRLResourceTypeDefinition> {
 
     @Test
-    public void testIndexDrlRuleAttributeNameAndValues() throws IOException, InterruptedException {
+    public void testIndexDrlRuleAttributeNameAndValue() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
@@ -80,9 +80,11 @@ public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<DRLReso
                           hits.length );
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
-
         }
 
+        //This simply checks whether there is a Rule Attribute "ruleflow-group" and a Rule Attribute Value "myRuleflowGroup"
+        //The specific query does not check that the Rule Attribute Value corresponds to the Rule Attribute, so it is possible
+        //that the value relates to a different Rule Attribute.
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
@@ -103,7 +105,6 @@ public class IndexRuleAttributeNameAndValueTest extends BaseIndexingTest<DRLReso
                           hits.length );
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
-
         }
 
     }

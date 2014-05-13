@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.workbench.screens.drltext.backend.server.indexing;
+package org.drools.workbench.screens.guided.rule.backend.server.indexing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.drools.workbench.screens.drltext.type.DRLResourceTypeDefinition;
+import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -45,18 +45,18 @@ import org.uberfire.metadata.model.KObject;
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexRuleAttributeNameAndValueTest2 extends BaseIndexingTest<DRLResourceTypeDefinition> {
+public class IndexRuleAttributeNameAndValueCompositionTest extends BaseIndexingTest<GuidedRuleDRLResourceTypeDefinition> {
 
     @Test
-    public void testIndexDrlRuleAttributeNameAndValues2() throws IOException, InterruptedException {
+    public void testIndexDrlRuleAttributeNameAndValues() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
                            "<none>" );
 
         //Add test files
-        final Path path = basePath.resolve( "drl5.drl" );
-        final String drl = loadText( "drl5.drl" );
+        final Path path = basePath.resolve( "drl1.rdrl" );
+        final String drl = loadText( "drl1.rdrl" );
         ioService().write( path,
                            drl );
 
@@ -65,6 +65,7 @@ public class IndexRuleAttributeNameAndValueTest2 extends BaseIndexingTest<DRLRes
         final Index index = getConfig().getIndexManager().get( org.uberfire.metadata.io.KObjectUtil.toKCluster( basePath.getFileSystem() ) );
 
         //DRL defining a RuleFlow-Group named myRuleFlowGroup. This should match drl5.drl
+        //This checks whether there is a Rule Attribute "ruleflow-group" and its Value is "myRuleflowGroup"
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
@@ -88,7 +89,6 @@ public class IndexRuleAttributeNameAndValueTest2 extends BaseIndexingTest<DRLRes
                             path );
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
-
         }
 
         //DRL defining a RuleFlow-Group named myAgendaGroup. This should *NOT* match drl5.drl
@@ -108,14 +108,13 @@ public class IndexRuleAttributeNameAndValueTest2 extends BaseIndexingTest<DRLRes
                           hits.length );
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
-
         }
 
     }
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestDrlFileIndexer();
+        return new TestGuidedRuleDrlFileIndexer();
     }
 
     @Override
@@ -127,8 +126,8 @@ public class IndexRuleAttributeNameAndValueTest2 extends BaseIndexingTest<DRLRes
     }
 
     @Override
-    protected DRLResourceTypeDefinition getResourceTypeDefinition() {
-        return new DRLResourceTypeDefinition();
+    protected GuidedRuleDRLResourceTypeDefinition getResourceTypeDefinition() {
+        return new GuidedRuleDRLResourceTypeDefinition();
     }
 
     @Override
