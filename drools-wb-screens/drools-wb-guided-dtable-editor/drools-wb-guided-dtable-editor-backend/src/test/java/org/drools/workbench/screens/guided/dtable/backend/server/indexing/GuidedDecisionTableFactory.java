@@ -22,6 +22,8 @@ import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.oracle.DataType;
 import org.drools.workbench.models.datamodel.rule.ActionFieldValue;
 import org.drools.workbench.models.datamodel.rule.ActionInsertFact;
+import org.drools.workbench.models.datamodel.rule.ActionSetField;
+import org.drools.workbench.models.datamodel.rule.ActionUpdateField;
 import org.drools.workbench.models.datamodel.rule.BaseSingleFieldConstraint;
 import org.drools.workbench.models.datamodel.rule.FactPattern;
 import org.drools.workbench.models.datamodel.rule.FieldNatureType;
@@ -137,6 +139,7 @@ public class GuidedDecisionTableFactory {
         fp1.setFactType( "Applicant" );
         final SingleFieldConstraint sfc1 = new SingleFieldConstraint();
         sfc1.setConstraintValueType( BaseSingleFieldConstraint.TYPE_TEMPLATE );
+        sfc1.setFactType( "Applicant" );
         sfc1.setOperator( "==" );
         sfc1.setFieldName( "age" );
         sfc1.setValue( "f1" );
@@ -146,6 +149,7 @@ public class GuidedDecisionTableFactory {
         fp2.setFactType( "Mortgage" );
         final SingleFieldConstraint sfc2 = new SingleFieldConstraint();
         sfc2.setConstraintValueType( BaseSingleFieldConstraint.TYPE_TEMPLATE );
+        sfc2.setFactType( "Mortgage" );
         sfc2.setOperator( "==" );
         sfc2.setFieldName( "amount" );
         sfc2.setValue( "f2" );
@@ -178,6 +182,7 @@ public class GuidedDecisionTableFactory {
 
         final ActionInsertFact ifc1 = new ActionInsertFact();
         ifc1.setFactType( "Applicant" );
+        ifc1.setBoundName( "$a" );
         final ActionFieldValue afv1 = new ActionFieldValue();
         afv1.setNature( FieldNatureType.TYPE_TEMPLATE );
         afv1.setField( "age" );
@@ -186,11 +191,24 @@ public class GuidedDecisionTableFactory {
 
         final ActionInsertFact ifc2 = new ActionInsertFact();
         ifc2.setFactType( "Mortgage" );
+        ifc2.setBoundName( "$m" );
         final ActionFieldValue afv2 = new ActionFieldValue();
         afv2.setNature( FieldNatureType.TYPE_TEMPLATE );
         afv2.setField( "amount" );
         afv2.setValue( "f2" );
         ifc2.addFieldValue( afv2 );
+
+        final ActionSetField asf = new ActionSetField();
+        asf.setVariable( "$a" );
+        asf.addFieldValue( new ActionFieldValue( "age",
+                                                 "33",
+                                                 DataType.TYPE_NUMERIC_INTEGER ) );
+
+        final ActionUpdateField auf = new ActionUpdateField();
+        asf.setVariable( "$m" );
+        asf.addFieldValue( new ActionFieldValue( "amount",
+                                                 "10000",
+                                                 DataType.TYPE_NUMERIC_INTEGER ) );
 
         brl.getDefinition().add( ifc1 );
         brl.getDefinition().add( ifc2 );
@@ -198,6 +216,9 @@ public class GuidedDecisionTableFactory {
                                                                 DataType.TYPE_NUMERIC_INTEGER ) );
         brl.getChildColumns().add( new BRLActionVariableColumn( "f2",
                                                                 DataType.TYPE_NUMERIC_INTEGER ) );
+        brl.getDefinition().add( asf );
+        brl.getDefinition().add( auf );
+
         dt.getConditions().add( brl );
 
         dt.setData( DataUtilities.makeDataLists( new String[][]{

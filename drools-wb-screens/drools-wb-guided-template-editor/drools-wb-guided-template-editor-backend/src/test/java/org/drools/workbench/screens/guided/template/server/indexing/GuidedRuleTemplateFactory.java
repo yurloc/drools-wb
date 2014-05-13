@@ -22,6 +22,8 @@ import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.oracle.DataType;
 import org.drools.workbench.models.datamodel.rule.ActionFieldValue;
 import org.drools.workbench.models.datamodel.rule.ActionInsertFact;
+import org.drools.workbench.models.datamodel.rule.ActionSetField;
+import org.drools.workbench.models.datamodel.rule.ActionUpdateField;
 import org.drools.workbench.models.datamodel.rule.FactPattern;
 import org.drools.workbench.models.datamodel.rule.FieldNatureType;
 import org.drools.workbench.models.datamodel.rule.RuleAttribute;
@@ -54,6 +56,7 @@ public class GuidedRuleTemplateFactory {
         final FactPattern p1 = new FactPattern( "Applicant" );
         final SingleFieldConstraint con1 = new SingleFieldConstraint();
         con1.setFieldType( DataType.TYPE_NUMERIC_INTEGER );
+        con1.setFactType( "Applicant" );
         con1.setFieldName( "age" );
         con1.setOperator( "==" );
         con1.setValue( "f1" );
@@ -65,6 +68,7 @@ public class GuidedRuleTemplateFactory {
         final FactPattern p2 = new FactPattern( "Mortgage" );
         final SingleFieldConstraint con2 = new SingleFieldConstraint();
         con2.setFieldType( DataType.TYPE_NUMERIC_INTEGER );
+        con1.setFactType( "Mortgage" );
         con2.setFieldName( "amount" );
         con2.setOperator( "==" );
         con2.setValue( "f2" );
@@ -88,6 +92,7 @@ public class GuidedRuleTemplateFactory {
 
         final ActionInsertFact ifc1 = new ActionInsertFact();
         ifc1.setFactType( "Applicant" );
+        ifc1.setBoundName( "$a" );
         final ActionFieldValue afv1 = new ActionFieldValue();
         afv1.setNature( FieldNatureType.TYPE_TEMPLATE );
         afv1.setField( "age" );
@@ -98,6 +103,7 @@ public class GuidedRuleTemplateFactory {
 
         final ActionInsertFact ifc2 = new ActionInsertFact();
         ifc2.setFactType( "Mortgage" );
+        ifc2.setBoundName( "$m" );
         final ActionFieldValue afv2 = new ActionFieldValue();
         afv2.setNature( FieldNatureType.TYPE_TEMPLATE );
         afv2.setField( "amount" );
@@ -105,6 +111,22 @@ public class GuidedRuleTemplateFactory {
         ifc2.addFieldValue( afv2 );
 
         model.addRhsItem( ifc2 );
+
+        final ActionSetField asf = new ActionSetField();
+        asf.setVariable( "$a" );
+        asf.addFieldValue( new ActionFieldValue( "age",
+                                                 "33",
+                                                 DataType.TYPE_NUMERIC_INTEGER ) );
+
+        model.addRhsItem( asf );
+
+        final ActionUpdateField auf = new ActionUpdateField();
+        asf.setVariable( "$m" );
+        asf.addFieldValue( new ActionFieldValue( "amount",
+                                                 "10000",
+                                                 DataType.TYPE_NUMERIC_INTEGER ) );
+
+        model.addRhsItem( auf );
 
         model.addRow( new String[]{ "33", null } );
 

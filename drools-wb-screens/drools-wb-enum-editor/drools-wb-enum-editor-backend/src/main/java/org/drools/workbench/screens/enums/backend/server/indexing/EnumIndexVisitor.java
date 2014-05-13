@@ -69,7 +69,8 @@ public class EnumIndexVisitor {
             final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                          fieldName );
             builder.addField( new TypeField( fieldName,
-                                             fieldFullyQualifiedClassName ) );
+                                             fieldFullyQualifiedClassName,
+                                             fullyQualifiedClassName ) );
         }
 
         results.addAll( builder.build() );

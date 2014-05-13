@@ -94,7 +94,8 @@ public class TestScenarioIndexVisitor {
                 final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                              fieldName );
                 builder.addField( new TypeField( fieldName,
-                                                 fieldFullyQualifiedClassName ) );
+                                                 fieldFullyQualifiedClassName,
+                                                 fullyQualifiedClassName ) );
             }
 
         } else if ( fixture instanceof VerifyFact ) {
@@ -117,7 +118,8 @@ public class TestScenarioIndexVisitor {
                 final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                              fieldName );
                 builder.addField( new TypeField( fieldName,
-                                                 fieldFullyQualifiedClassName ) );
+                                                 fieldFullyQualifiedClassName,
+                                                 fullyQualifiedClassName ) );
             }
         }
     }

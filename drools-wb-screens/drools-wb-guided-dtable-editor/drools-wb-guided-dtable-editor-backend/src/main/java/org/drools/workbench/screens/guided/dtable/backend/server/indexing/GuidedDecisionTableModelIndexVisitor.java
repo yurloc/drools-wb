@@ -123,8 +123,11 @@ public class GuidedDecisionTableModelIndexVisitor {
     }
 
     private void visit( final ConditionCol52 o ) {
+        final Pattern52 p = model.getPattern( o );
+        final String fullyQualifiedClassName = getFullyQualifiedClassName( p.getFactType() );
         builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getFieldType() ) ) );
+                                         getFullyQualifiedClassName( o.getFieldType() ),
+                                         fullyQualifiedClassName ) );
     }
 
     private void visit( final BRLActionColumn o ) {
@@ -139,14 +142,19 @@ public class GuidedDecisionTableModelIndexVisitor {
     }
 
     private void visit( final ActionInsertFactCol52 o ) {
-        builder.addType( new Type( getFullyQualifiedClassName( o.getFactType() ) ) );
+        final String fullyQualifiedClassName = getFullyQualifiedClassName( o.getFactType() );
+        builder.addType( new Type( fullyQualifiedClassName ) );
         builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getType() ) ) );
+                                         getFullyQualifiedClassName( o.getType() ),
+                                         fullyQualifiedClassName ) );
     }
 
     private void visit( final ActionSetFieldCol52 o ) {
+        final Pattern52 p = model.getConditionPattern( o.getBoundName() );
+        final String fullyQualifiedClassName = getFullyQualifiedClassName( p.getFactType() );
         builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getType() ) ) );
+                                         getFullyQualifiedClassName( o.getType() ),
+                                         fullyQualifiedClassName ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {

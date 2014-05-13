@@ -21,7 +21,6 @@ import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.rule.ActionFieldValue;
 import org.drools.workbench.models.datamodel.rule.ActionInsertFact;
 import org.drools.workbench.models.datamodel.rule.ActionSetField;
-import org.drools.workbench.models.datamodel.rule.ActionUpdateField;
 import org.drools.workbench.models.datamodel.rule.CompositeFactPattern;
 import org.drools.workbench.models.datamodel.rule.CompositeFieldConstraint;
 import org.drools.workbench.models.datamodel.rule.ConnectiveConstraint;
@@ -96,12 +95,6 @@ public class GuidedRuleTemplateIndexVisitor {
             visitDSLSentence( (DSLSentence) o );
         } else if ( o instanceof ActionInsertFact ) {
             visitActionFieldList( (ActionInsertFact) o );
-        } else if ( o instanceof ActionUpdateField ) {
-            visitActionFieldList( (ActionUpdateField) o );
-        } else if ( o instanceof ActionSetField ) {
-            visitActionFieldList( (ActionSetField) o );
-        } else if ( o instanceof ActionFieldValue ) {
-            visit( (ActionFieldValue) o );
         }
     }
 
@@ -115,15 +108,11 @@ public class GuidedRuleTemplateIndexVisitor {
         builder.addType( new Type( getFullyQualifiedClassName( afl.getFactType() ) ) );
     }
 
-    private void visitActionFieldList( final ActionSetField afl ) {
+    private void visitActionFieldList( final String fullyQualifiedClassName,
+                                       final ActionSetField afl ) {
         for ( ActionFieldValue afv : afl.getFieldValues() ) {
-            visit( afv );
-        }
-    }
-
-    private void visitActionFieldList( final ActionUpdateField afl ) {
-        for ( ActionFieldValue afv : afl.getFieldValues() ) {
-            visit( afv );
+            visit( fullyQualifiedClassName,
+                   afv );
         }
     }
 
@@ -193,14 +182,34 @@ public class GuidedRuleTemplateIndexVisitor {
         if ( model.rhs != null ) {
             for ( int i = 0; i < model.rhs.length; i++ ) {
                 IAction action = model.rhs[ i ];
-                visit( action );
+                if ( action instanceof ActionSetField ) {
+                    final ActionSetField asf = (ActionSetField) action;
+                    final String typeName = getTypeNameForBinding( asf.getVariable() );
+                    if ( typeName != null ) {
+                        final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
+                        visitActionFieldList( fullyQualifiedClassName,
+                                              asf );
+                    }
+                } else {
+                    visit( action );
+                }
             }
         }
     }
 
+    private String getTypeNameForBinding( final String binding ) {
+        if ( model.getAllLHSVariables().contains( binding ) ) {
+            return model.getLHSBindingType( binding );
+        } else if ( model.getAllRHSVariables().contains( binding ) ) {
+            return model.getRHSBoundFact( binding ).getFactType();
+        }
+        return null;
+    }
+
     private void visitSingleFieldConstraint( final SingleFieldConstraint sfc ) {
         builder.addField( new TypeField( sfc.getFieldName(),
-                                         getFullyQualifiedClassName( sfc.getFieldType() ) ) );
+                                         getFullyQualifiedClassName( sfc.getFieldType() ),
+                                         getFullyQualifiedClassName( sfc.getFactType() ) ) );
         if ( sfc.getConnectives() != null ) {
             for ( int i = 0; i < sfc.getConnectives().length; i++ ) {
                 visit( sfc.getConnectives()[ i ] );
@@ -210,7 +219,8 @@ public class GuidedRuleTemplateIndexVisitor {
 
     private void visitConnectiveConstraint( final ConnectiveConstraint cc ) {
         builder.addField( new TypeField( cc.getFieldName(),
-                                         getFullyQualifiedClassName( cc.getFieldType() ) ) );
+                                         getFullyQualifiedClassName( cc.getFieldType() ),
+                                         getFullyQualifiedClassName( cc.getFactType() ) ) );
     }
 
     private void visitSingleFieldConstraint( final SingleFieldConstraintEBLeftSide sfexp ) {
@@ -223,9 +233,11 @@ public class GuidedRuleTemplateIndexVisitor {
         }
     }
 
-    private void visit( final ActionFieldValue afv ) {
+    private void visit( final String fullyQualifiedClassName,
+                        final ActionFieldValue afv ) {
         builder.addField( new TypeField( afv.getField(),
-                                         getFullyQualifiedClassName( afv.getType() ) ) );
+                                         getFullyQualifiedClassName( afv.getType() ),
+                                         fullyQualifiedClassName ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {

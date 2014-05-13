@@ -60,7 +60,8 @@ public class GuidedScoreCardIndexVisitor {
         final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                      fieldName );
         builder.addField( new TypeField( fieldName,
-                                         fieldFullyQualifiedClassName ) );
+                                         fieldFullyQualifiedClassName,
+                                         fullyQualifiedClassName ) );
 
         //Add Characteristics
         for ( Characteristic c : model.getCharacteristics() ) {
@@ -81,7 +82,8 @@ public class GuidedScoreCardIndexVisitor {
         final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                      fieldName );
         builder.addField( new TypeField( fieldName,
-                                         fieldFullyQualifiedClassName ) );
+                                         fieldFullyQualifiedClassName,
+                                         fullyQualifiedClassName ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {
