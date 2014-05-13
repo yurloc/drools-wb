@@ -15,7 +15,7 @@
  */
 package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
-import java.util.List;
+import java.util.Set;
 
 import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.rule.ActionFieldValue;
@@ -61,7 +61,7 @@ public class GuidedRuleModelIndexVisitor {
                                                          model );
     }
 
-    public List<Pair<String, String>> visit() {
+    public Set<Pair<String, String>> visit() {
         visit( model );
         return builder.build();
     }

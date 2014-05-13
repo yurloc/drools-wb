@@ -15,9 +15,9 @@
  */
 package org.drools.workbench.screens.enums.backend.server.indexing;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.drools.workbench.models.datamodel.oracle.DataType;
 import org.drools.workbench.models.datamodel.oracle.ModelField;
@@ -38,7 +38,7 @@ public class EnumIndexVisitor {
     private final DefaultIndexBuilder builder;
     private final DataEnumLoader enumLoader;
     private final String packageName;
-    private final List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
+    private final Set<Pair<String, String>> results = new HashSet<Pair<String, String>>();
 
     public EnumIndexVisitor( final ProjectDataModelOracle dmo,
                              final DefaultIndexBuilder builder,
@@ -54,7 +54,7 @@ public class EnumIndexVisitor {
                                                                packageName );
     }
 
-    public List<Pair<String, String>> visit() {
+    public Set<Pair<String, String>> visit() {
         if ( enumLoader.hasErrors() ) {
             return results;
         }

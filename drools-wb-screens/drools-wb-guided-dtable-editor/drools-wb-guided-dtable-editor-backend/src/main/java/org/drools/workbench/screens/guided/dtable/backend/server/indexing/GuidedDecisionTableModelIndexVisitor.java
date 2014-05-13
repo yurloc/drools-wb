@@ -15,8 +15,8 @@
  */
 package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.rule.IAction;
@@ -47,7 +47,7 @@ public class GuidedDecisionTableModelIndexVisitor {
 
     private final DefaultIndexBuilder builder;
     private final GuidedDecisionTable52 model;
-    private final List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
+    private final Set<Pair<String, String>> results = new HashSet<Pair<String, String>>();
 
     public GuidedDecisionTableModelIndexVisitor( final DefaultIndexBuilder builder,
                                                  final GuidedDecisionTable52 model ) {
@@ -57,7 +57,7 @@ public class GuidedDecisionTableModelIndexVisitor {
                                                          model );
     }
 
-    public List<Pair<String, String>> visit() {
+    public Set<Pair<String, String>> visit() {
         visit( model );
         results.addAll( builder.build() );
         return results;

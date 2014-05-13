@@ -16,8 +16,8 @@
 package org.drools.workbench.screens.testscenario.backend.server.indexing;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -58,7 +58,7 @@ public class TestScenarioIndexVisitor {
                                                          model );
     }
 
-    public List<Pair<String, String>> visit() {
+    public Set<Pair<String, String>> visit() {
         visit( model );
         return builder.build();
     }

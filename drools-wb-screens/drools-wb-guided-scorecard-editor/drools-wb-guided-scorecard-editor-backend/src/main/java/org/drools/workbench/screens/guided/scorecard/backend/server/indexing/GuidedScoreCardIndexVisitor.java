@@ -15,7 +15,7 @@
  */
 package org.drools.workbench.screens.guided.scorecard.backend.server.indexing;
 
-import java.util.List;
+import java.util.Set;
 
 import org.drools.workbench.models.datamodel.imports.Import;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -49,7 +49,7 @@ public class GuidedScoreCardIndexVisitor {
                                                          model );
     }
 
-    public List<Pair<String, String>> visit() {
+    public Set<Pair<String, String>> visit() {
         //Add type
         final String typeName = model.getFactName();
         final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
