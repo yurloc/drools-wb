@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.workbench.screens.dsltext.backend.server.indexing;
+package org.drools.workbench.screens.enums.backend.server.indexing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,12 +24,13 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.apache.lucene.search.WildcardQuery;
-import org.drools.workbench.screens.dsltext.type.DSLResourceTypeDefinition;
+import org.drools.workbench.screens.enums.type.EnumResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
@@ -44,22 +45,22 @@ import org.uberfire.metadata.model.KObject;
 import static org.apache.lucene.util.Version.*;
 import static org.junit.Assert.*;
 
-public class IndexDslEntriesTest extends BaseIndexingTest<DSLResourceTypeDefinition> {
+public class IndexEnumEntriesTest extends BaseIndexingTest<EnumResourceTypeDefinition> {
 
     @Test
-    public void testIndexDslEntries() throws IOException, InterruptedException {
+    public void testIndexEnumEntries() throws IOException, InterruptedException {
         //Don't ask, but we need to write a single file first in order for indexing to work
         final Path basePath = getDirectoryPath().resolveSibling( "someNewOtherPath" );
         ioService().write( basePath.resolve( "dummy" ),
                            "<none>" );
 
         //Add test files
-        final Path path1 = basePath.resolve( "dsl1.dsl" );
-        final String dsl1 = loadText( "dsl1.dsl" );
+        final Path path1 = basePath.resolve( "enum1.enumeration" );
+        final String dsl1 = loadText( "enum1.enumeration" );
         ioService().write( path1,
                            dsl1 );
-        final Path path2 = basePath.resolve( "dsl2.dsl" );
-        final String dsl2 = loadText( "dsl2.dsl" );
+        final Path path2 = basePath.resolve( "enum2.enumeration" );
+        final String dsl2 = loadText( "enum2.enumeration" );
         ioService().write( path2,
                            dsl2 );
 
@@ -67,28 +68,14 @@ public class IndexDslEntriesTest extends BaseIndexingTest<DSLResourceTypeDefinit
 
         final Index index = getConfig().getIndexManager().get( org.uberfire.metadata.io.KObjectUtil.toKCluster( basePath.getFileSystem() ) );
 
-        {
-            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
-                                                                                true );
-
-            searcher.search( new WildcardQuery( new Term( IndexableElements.RULE_NAME.toString(),
-                                                          "*" ) ),
-                             collector );
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            assertEquals( 0,
-                          hits.length );
-
-            ( (LuceneIndex) index ).nrtRelease( searcher );
-        }
-
+        //Enumerations using org.drools.workbench.screens.enums.backend.server.indexing.classes.Applicant
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
 
             searcher.search( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                      "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.applicant" ) ),
+                                                      "org.drools.workbench.screens.enums.backend.server.indexing.classes.applicant" ) ),
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
             assertEquals( 2,
@@ -106,13 +93,14 @@ public class IndexDslEntriesTest extends BaseIndexingTest<DSLResourceTypeDefinit
             ( (LuceneIndex) index ).nrtRelease( searcher );
         }
 
+        //Enumerations using org.drools.workbench.screens.enums.backend.server.indexing.classes.Mortgage
         {
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
 
             searcher.search( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                      "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.mortgage" ) ),
+                                                      "org.drools.workbench.screens.enums.backend.server.indexing.classes.mortgage" ) ),
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
             assertEquals( 1,
@@ -127,11 +115,66 @@ public class IndexDslEntriesTest extends BaseIndexingTest<DSLResourceTypeDefinit
 
             ( (LuceneIndex) index ).nrtRelease( searcher );
         }
+
+        //Enumerations using org.drools.workbench.screens.enums.backend.server.indexing.classes.Mortgage#amount
+        {
+            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
+            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
+                                                                                true );
+
+            final BooleanQuery query = new BooleanQuery();
+            query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
+                                                "org.drools.workbench.screens.enums.backend.server.indexing.classes.mortgage" ) ),
+                       BooleanClause.Occur.MUST );
+            query.add( new TermQuery( new Term( IndexableElements.FIELD_TYPE_NAME.toString(),
+                                                "amount" ) ),
+                       BooleanClause.Occur.MUST );
+            searcher.search( query,
+                             collector );
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            assertEquals( 1,
+                          hits.length );
+
+            final List<KObject> results = new ArrayList<KObject>();
+            for ( int i = 0; i < hits.length; i++ ) {
+                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
+            }
+            assertContains( results,
+                            path2 );
+
+            ( (LuceneIndex) index ).nrtRelease( searcher );
+        }
+
+        //Enumerations using java.lang.Integer
+        {
+            final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
+            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
+                                                                                true );
+
+            searcher.search( new TermQuery( new Term( IndexableElements.FIELD_TYPE_FULLY_QUALIFIED_CLASS_NAME.toString(),
+                                                      "java.lang.integer" ) ),
+                             collector );
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            assertEquals( 2,
+                          hits.length );
+
+            final List<KObject> results = new ArrayList<KObject>();
+            for ( int i = 0; i < hits.length; i++ ) {
+                results.add( KObjectUtil.toKObject( searcher.doc( hits[ i ].doc ) ) );
+            }
+            assertContains( results,
+                            path1 );
+            assertContains( results,
+                            path2 );
+
+            ( (LuceneIndex) index ).nrtRelease( searcher );
+        }
+
     }
 
     @Override
     protected TestIndexer getIndexer() {
-        return new TestDslFileIndexer();
+        return new TestEnumFileIndexer();
     }
 
     @Override
@@ -143,8 +186,8 @@ public class IndexDslEntriesTest extends BaseIndexingTest<DSLResourceTypeDefinit
     }
 
     @Override
-    protected DSLResourceTypeDefinition getResourceTypeDefinition() {
-        return new DSLResourceTypeDefinition();
+    protected EnumResourceTypeDefinition getResourceTypeDefinition() {
+        return new EnumResourceTypeDefinition();
     }
 
     @Override

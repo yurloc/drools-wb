@@ -121,6 +121,7 @@ public class DslFileIndexer implements Indexer {
         return KObjectUtil.toKObjectKey( path );
     }
 
+    //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
         return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
     }
