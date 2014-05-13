@@ -159,7 +159,8 @@ public class GuidedDecisionTableModelIndexVisitor {
                 return i.getType();
             }
         }
-        return model.getPackageName() + "." + typeName;
+        final String packageName = model.getPackageName();
+        return ( !( packageName == null || packageName.isEmpty() ) ? packageName + "." + typeName : typeName );
     }
 
 }
