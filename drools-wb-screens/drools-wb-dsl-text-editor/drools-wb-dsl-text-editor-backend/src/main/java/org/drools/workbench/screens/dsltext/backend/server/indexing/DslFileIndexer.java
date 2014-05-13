@@ -15,17 +15,23 @@
  */
 package org.drools.workbench.screens.dsltext.backend.server.indexing;
 
-import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.drools.compiler.compiler.DrlParser;
+import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.compiler.lang.dsl.DSLMappingEntry;
 import org.drools.compiler.lang.dsl.DSLTokenizedMappingFile;
 import org.drools.workbench.screens.dsltext.type.DSLResourceTypeDefinition;
+import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
+import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
+import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
@@ -45,6 +51,9 @@ public class DslFileIndexer implements Indexer {
     protected IOService ioService;
 
     @Inject
+    private ProjectService projectService;
+
+    @Inject
     protected DSLResourceTypeDefinition dslType;
 
     @Override
@@ -54,27 +63,86 @@ public class DslFileIndexer implements Indexer {
 
     @Override
     public KObject toKObject( final Path path ) {
-        final String dsl = ioService.readAllString( path );
-        final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-        final DSLTokenizedMappingFile dslLoader = new DSLTokenizedMappingFile();
+        KObject index = null;
+
         try {
+            final List<String> lhs = new ArrayList<String>();
+            final List<String> rhs = new ArrayList<String>();
+            final String dsl = ioService.readAllString( path );
+
+            //Construct a dummy DRL file to parse index elements
+            final DSLTokenizedMappingFile dslLoader = new DSLTokenizedMappingFile();
             if ( dslLoader.parseAndLoad( new StringReader( dsl ) ) ) {
                 for ( DSLMappingEntry e : dslLoader.getMapping().getEntries() ) {
-                    //TODO Index DSLs!
-                    System.out.println( e );
+                    switch ( e.getSection() ) {
+                        case CONDITION:
+                            lhs.add( e.getValuePattern() );
+                            break;
+                        case CONSEQUENCE:
+                            rhs.add( e.getValuePattern() );
+                            break;
+                    }
                 }
+
+                final String drl = makeDrl( path,
+                                            lhs,
+                                            rhs );
+                final DrlParser drlParser = new DrlParser();
+                final PackageDescr packageDescr = drlParser.parse( true,
+                                                                   drl );
+                if ( packageDescr == null ) {
+                    logger.error( "Unable to parse DRL for '" + path.toUri().toString() + "'." );
+                    return index;
+                }
+
+                //Don't include rules created to parse DSL
+                final DefaultIndexBuilder builder = new DefaultIndexBuilder( path ) {
+                    @Override
+                    public DefaultIndexBuilder addRule( Rule rule ) {
+                        return this;
+                    }
+                };
+
+                final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+                                                                                       packageDescr );
+                visitor.visit();
+
                 return KObjectUtil.toKObject( path,
                                               builder.build() );
             }
-        } catch ( IOException e ) {
+        } catch ( Exception e ) {
             logger.error( e.getMessage() );
         }
-        return null;
+        return index;
     }
 
     @Override
     public KObjectKey toKObjectKey( final Path path ) {
         return KObjectUtil.toKObjectKey( path );
+    }
+
+    protected String getPackageName( final Path path ) {
+        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
+    }
+
+    private String makeDrl( final Path path,
+                            final List<String> lhs,
+                            final List<String> rhs ) {
+        final StringBuilder sb = new StringBuilder();
+        final String packageName = getPackageName( path );
+
+        sb.append( "package " ).append( packageName ).append( "\n" );
+        sb.append( "rule \"mock\"\n" );
+        sb.append( "when\n" );
+        for ( String e : lhs ) {
+            sb.append( e ).append( "\n" );
+        }
+        sb.append( "then\n" );
+        for ( String e : rhs ) {
+            sb.append( e ).append( "\n" );
+        }
+        sb.append( "end\n" );
+        return sb.toString();
     }
 
 }
