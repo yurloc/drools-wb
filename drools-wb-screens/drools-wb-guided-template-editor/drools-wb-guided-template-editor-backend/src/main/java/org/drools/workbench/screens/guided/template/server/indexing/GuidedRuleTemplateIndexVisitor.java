@@ -35,11 +35,11 @@ import org.drools.workbench.models.datamodel.rule.IAction;
 import org.drools.workbench.models.datamodel.rule.IFactPattern;
 import org.drools.workbench.models.datamodel.rule.IPattern;
 import org.drools.workbench.models.datamodel.rule.RuleAttribute;
-import org.drools.workbench.models.datamodel.rule.RuleModel;
 import org.drools.workbench.models.datamodel.rule.SingleFieldConstraint;
 import org.drools.workbench.models.datamodel.rule.SingleFieldConstraintEBLeftSide;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
 import org.uberfire.commons.data.Pair;
@@ -67,8 +67,8 @@ public class GuidedRuleTemplateIndexVisitor {
     }
 
     private void visit( final Object o ) {
-        if ( o instanceof RuleModel ) {
-            visitRuleModel( (RuleModel) o );
+        if ( o instanceof TemplateModel ) {
+            visitRuleModel( (TemplateModel) o );
         } else if ( o instanceof RuleAttribute ) {
             visitRuleAttribute( (RuleAttribute) o );
         } else if ( o instanceof FactPattern ) {
@@ -166,19 +166,22 @@ public class GuidedRuleTemplateIndexVisitor {
         visit( pattern.getFactPattern() );
     }
 
-    public void visitRuleModel( final RuleModel model ) {
+    public void visitRuleModel( final TemplateModel model ) {
+        //Add Attributes
         if ( model.attributes != null ) {
             for ( int i = 0; i < model.attributes.length; i++ ) {
                 RuleAttribute attr = model.attributes[ i ];
                 visit( attr );
             }
         }
+        //Add Types and Fields used by LHS
         if ( model.lhs != null ) {
             for ( int i = 0; i < model.lhs.length; i++ ) {
                 IPattern pattern = model.lhs[ i ];
                 visit( pattern );
             }
         }
+        //Add Types and Fields used by RHS
         if ( model.rhs != null ) {
             for ( int i = 0; i < model.rhs.length; i++ ) {
                 IAction action = model.rhs[ i ];
@@ -195,6 +198,14 @@ public class GuidedRuleTemplateIndexVisitor {
                 }
             }
         }
+        //Add rule names
+        final String parentRuleName = model.parentName;
+        for ( int i = 0; i < model.getRowsCount(); i++ ) {
+            final String ruleName = model.name + "_" + i;
+            builder.addRule( new Rule( ruleName,
+                                       parentRuleName ) );
+        }
+
     }
 
     private String getTypeNameForBinding( final String binding ) {

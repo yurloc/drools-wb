@@ -36,6 +36,7 @@ import org.drools.workbench.models.guided.dtable.shared.model.DTCellValue52;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.models.guided.dtable.shared.model.Pattern52;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.RuleAttribute;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
@@ -82,22 +83,28 @@ public class GuidedDecisionTableModelIndexVisitor {
             visit( (ActionInsertFactCol52) o );
         } else if ( o instanceof ActionSetFieldCol52 ) {
             visit( (ActionSetFieldCol52) o );
-        } else if ( o instanceof IPattern ) {
-            visit( (IPattern) o );
-        } else if ( o instanceof IAction ) {
-            visit( (IAction) o );
         }
     }
 
     private void visit( final GuidedDecisionTable52 o ) {
+        //Add attributes
         for ( AttributeCol52 c : o.getAttributeCols() ) {
             visit( c );
         }
+        //Add Types and Fields used by Conditions
         for ( CompositeColumn<? extends BaseColumn> c : o.getConditions() ) {
             visit( c );
         }
+        //Add Types and Fields used by Actions
         for ( ActionCol52 c : o.getActionCols() ) {
             visit( c );
+        }
+        //Add rule names
+        final String parentRuleName = model.getParentName();
+        for ( List<DTCellValue52> row : model.getData() ) {
+            final String ruleName = "Row " + row.get( 0 ).getNumericValue().longValue() + " " + model.getTableName();
+            builder.addRule( new Rule( ruleName,
+                                       parentRuleName ) );
         }
     }
 

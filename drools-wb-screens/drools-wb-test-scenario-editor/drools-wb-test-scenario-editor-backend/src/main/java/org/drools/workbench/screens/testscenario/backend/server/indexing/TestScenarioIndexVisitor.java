@@ -31,7 +31,9 @@ import org.drools.workbench.models.testscenarios.shared.FixturesMap;
 import org.drools.workbench.models.testscenarios.shared.Scenario;
 import org.drools.workbench.models.testscenarios.shared.VerifyFact;
 import org.drools.workbench.models.testscenarios.shared.VerifyField;
+import org.drools.workbench.models.testscenarios.shared.VerifyRuleFired;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
 import org.uberfire.commons.data.Pair;
@@ -86,7 +88,7 @@ public class TestScenarioIndexVisitor {
             final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
             builder.addType( new Type( fullyQualifiedClassName ) );
 
-            factDataToFullyQualifiedClassNameMap.put( typeName,
+            factDataToFullyQualifiedClassNameMap.put( factData.getName(),
                                                       fullyQualifiedClassName );
 
             for ( Field field : factData.getFieldData() ) {
@@ -121,6 +123,9 @@ public class TestScenarioIndexVisitor {
                                                  fieldFullyQualifiedClassName,
                                                  fullyQualifiedClassName ) );
             }
+        } else if ( fixture instanceof VerifyRuleFired ) {
+            final VerifyRuleFired verifyRuleFired = (VerifyRuleFired) fixture;
+            builder.addRule( new Rule( verifyRuleFired.getRuleName() ) );
         }
     }
 
