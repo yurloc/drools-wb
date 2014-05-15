@@ -26,8 +26,10 @@ import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.compiler.lang.dsl.DSLMappingEntry;
 import org.drools.compiler.lang.dsl.DSLTokenizedMappingFile;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.dsltext.type.DSLResourceTypeDefinition;
 import org.guvnor.common.services.project.service.ProjectService;
+import org.kie.workbench.common.services.datamodel.backend.server.service.DataModelService;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
@@ -49,6 +51,9 @@ public class DslFileIndexer implements Indexer {
     @Inject
     @Named("ioStrategy")
     protected IOService ioService;
+
+    @Inject
+    private DataModelService dataModelService;
 
     @Inject
     private ProjectService projectService;
@@ -103,7 +108,9 @@ public class DslFileIndexer implements Indexer {
                     }
                 };
 
-                final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+                final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
+                final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( dmo,
+                                                                                       builder,
                                                                                        packageDescr );
                 visitor.visit();
 
@@ -124,6 +131,11 @@ public class DslFileIndexer implements Indexer {
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
         return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
+    }
+
+    //Delegate resolution of DMO to method to assist testing
+    protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
     private String makeDrl( final Path path,

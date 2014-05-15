@@ -24,7 +24,9 @@ import javax.inject.Named;
 import org.drools.compiler.compiler.DecisionTableFactory;
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.dtablexls.type.DecisionTableXLSResourceTypeDefinition;
+import org.kie.workbench.common.services.datamodel.backend.server.service.DataModelService;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
@@ -46,6 +48,9 @@ public class DecisionTableXLSFileIndexer implements Indexer {
     @Inject
     @Named("ioStrategy")
     protected IOService ioService;
+
+    @Inject
+    private DataModelService dataModelService;
 
     @Inject
     protected DecisionTableXLSResourceTypeDefinition type;
@@ -73,8 +78,10 @@ public class DecisionTableXLSFileIndexer implements Indexer {
                 return index;
             }
 
+            final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( dmo,
+                                                                                   builder,
                                                                                    packageDescr );
             visitor.visit();
 
@@ -99,6 +106,11 @@ public class DecisionTableXLSFileIndexer implements Indexer {
     @Override
     public KObjectKey toKObjectKey( final Path path ) {
         return KObjectUtil.toKObjectKey( path );
+    }
+
+    //Delegate resolution of DMO to method to assist testing
+    protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }

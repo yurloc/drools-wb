@@ -15,8 +15,14 @@
  */
 package org.drools.workbench.screens.dsltext.backend.server.indexing;
 
+import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
+import org.drools.workbench.models.datamodel.oracle.DataType;
+import org.drools.workbench.models.datamodel.oracle.FieldAccessorsAndMutators;
+import org.drools.workbench.models.datamodel.oracle.ModelField;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.dsltext.type.DSLResourceTypeDefinition;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.uberfire.io.IOService;
@@ -42,4 +48,34 @@ public class TestDslFileIndexer extends DslFileIndexer implements TestIndexer<DS
     protected String getPackageName( final Path path ) {
         return "org.drools.workbench.screens.dsltext.backend.server.indexing.classes";
     }
+
+    @Override
+    protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
+        final ProjectDataModelOracle dmo = new ProjectDataModelOracleImpl();
+        dmo.addProjectModelFields( new HashMap<String, ModelField[]>() {{
+            put( "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.Applicant",
+                 new ModelField[]{ new ModelField( "age",
+                                                   "java.lang.Integer",
+                                                   ModelField.FIELD_CLASS_TYPE.REGULAR_CLASS,
+                                                   ModelField.FIELD_ORIGIN.DECLARED,
+                                                   FieldAccessorsAndMutators.ACCESSOR,
+                                                   DataType.TYPE_NUMERIC_INTEGER ) } );
+            put( "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.Mortgage",
+                 new ModelField[]{ new ModelField( "amount",
+                                                   "java.lang.Integer",
+                                                   ModelField.FIELD_CLASS_TYPE.REGULAR_CLASS,
+                                                   ModelField.FIELD_ORIGIN.DECLARED,
+                                                   FieldAccessorsAndMutators.ACCESSOR,
+                                                   DataType.TYPE_NUMERIC_INTEGER ) } );
+            put( "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.Mortgage",
+                 new ModelField[]{ new ModelField( "applicant",
+                                                   "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.Applicant",
+                                                   ModelField.FIELD_CLASS_TYPE.REGULAR_CLASS,
+                                                   ModelField.FIELD_ORIGIN.DECLARED,
+                                                   FieldAccessorsAndMutators.ACCESSOR,
+                                                   "org.drools.workbench.screens.dsltext.backend.server.indexing.classes.Applicant" ) } );
+        }} );
+        return dmo;
+    }
+
 }

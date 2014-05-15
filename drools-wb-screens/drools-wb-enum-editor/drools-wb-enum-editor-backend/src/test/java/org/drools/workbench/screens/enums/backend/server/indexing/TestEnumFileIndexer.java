@@ -67,6 +67,13 @@ public class TestEnumFileIndexer extends EnumFileIndexer implements TestIndexer<
                                                    ModelField.FIELD_ORIGIN.DECLARED,
                                                    FieldAccessorsAndMutators.ACCESSOR,
                                                    DataType.TYPE_NUMERIC_INTEGER ) } );
+            put( "org.drools.workbench.screens.enums.backend.server.indexing.classes.Mortgage",
+                 new ModelField[]{ new ModelField( "applicant",
+                                                   "org.drools.workbench.screens.enums.backend.server.indexing.classes.Applicant",
+                                                   ModelField.FIELD_CLASS_TYPE.REGULAR_CLASS,
+                                                   ModelField.FIELD_ORIGIN.DECLARED,
+                                                   FieldAccessorsAndMutators.ACCESSOR,
+                                                   "org.drools.workbench.screens.enums.backend.server.indexing.classes.Applicant" ) } );
         }} );
         return dmo;
     }

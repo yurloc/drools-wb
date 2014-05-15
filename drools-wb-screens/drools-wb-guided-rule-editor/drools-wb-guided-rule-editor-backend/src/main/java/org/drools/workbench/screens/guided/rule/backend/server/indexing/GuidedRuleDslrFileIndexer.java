@@ -30,10 +30,12 @@ import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.compiler.lang.dsl.DSLMappingFile;
 import org.drools.compiler.lang.dsl.DSLTokenizedMappingFile;
 import org.drools.compiler.lang.dsl.DefaultExpander;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDSLRResourceTypeDefinition;
 import org.guvnor.common.services.backend.file.FileDiscoveryService;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.workbench.common.services.backend.file.DSLFileFilter;
+import org.kie.workbench.common.services.datamodel.backend.server.service.DataModelService;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.PackageDescrIndexVisitor;
 import org.kie.workbench.common.services.refactoring.backend.server.util.KObjectUtil;
@@ -56,6 +58,9 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
     @Inject
     @Named("ioStrategy")
     protected IOService ioService;
+
+    @Inject
+    private DataModelService dataModelService;
 
     @Inject
     private FileDiscoveryService fileDiscoveryService;
@@ -87,8 +92,10 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
                 return index;
             }
 
+            final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( path );
-            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( builder,
+            final PackageDescrIndexVisitor visitor = new PackageDescrIndexVisitor( dmo,
+                                                                                   builder,
                                                                                    packageDescr );
             visitor.visit();
 
@@ -141,6 +148,11 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
             }
         }
         return dsls;
+    }
+
+    //Delegate resolution of DMO to method to assist testing
+    protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }
