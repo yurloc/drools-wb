@@ -41,6 +41,10 @@ import org.drools.workbench.models.datamodel.rule.SingleFieldConstraintEBLeftSid
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
+import org.kie.workbench.common.services.refactoring.model.index.terms.FieldIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeValueIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.validation.PortablePreconditions;
 
@@ -98,13 +102,13 @@ public class GuidedRuleModelIndexVisitor {
     }
 
     private void visitRuleAttribute( final RuleAttribute attr ) {
-        builder.addRuleAttribute( new org.kie.workbench.common.services.refactoring.model.index.RuleAttribute( attr.getAttributeName(),
-                                                                                                               attr.getValue() ) );
+        builder.addRuleAttribute( new org.kie.workbench.common.services.refactoring.model.index.RuleAttribute( new RuleAttributeIndexTerm( attr.getAttributeName() ),
+                                                                                                               new RuleAttributeValueIndexTerm( attr.getValue() ) ) );
     }
 
     //ActionInsertFact, ActionSetField, ActionUpdateField
     private void visitActionFieldList( final ActionInsertFact afl ) {
-        builder.addType( new Type( getFullyQualifiedClassName( afl.getFactType() ) ) );
+        builder.addType( new Type( new TypeIndexTerm( getFullyQualifiedClassName( afl.getFactType() ) ) ) );
     }
 
     private void visitActionFieldList( final String fullyQualifiedClassName,
@@ -116,7 +120,7 @@ public class GuidedRuleModelIndexVisitor {
     }
 
     private void visitCompositeFactPattern( final CompositeFactPattern pattern ) {
-        builder.addType( new Type( getFullyQualifiedClassName( pattern.getType() ) ) );
+        builder.addType( new Type( new TypeIndexTerm( getFullyQualifiedClassName( pattern.getType() ) ) ) );
         if ( pattern.getPatterns() != null ) {
             for ( IFactPattern fp : pattern.getPatterns() ) {
                 visit( fp );
@@ -138,7 +142,7 @@ public class GuidedRuleModelIndexVisitor {
     }
 
     private void visitFactPattern( final FactPattern pattern ) {
-        builder.addType( new Type( getFullyQualifiedClassName( pattern.getFactType() ) ) );
+        builder.addType( new Type( new TypeIndexTerm( getFullyQualifiedClassName( pattern.getFactType() ) ) ) );
         for ( FieldConstraint fc : pattern.getFieldConstraints() ) {
             visit( fc );
         }
@@ -206,9 +210,9 @@ public class GuidedRuleModelIndexVisitor {
     }
 
     private void visitSingleFieldConstraint( final SingleFieldConstraint sfc ) {
-        builder.addField( new TypeField( sfc.getFieldName(),
-                                         getFullyQualifiedClassName( sfc.getFieldType() ),
-                                         getFullyQualifiedClassName( sfc.getFactType() ) ) );
+        builder.addField( new TypeField( new FieldIndexTerm( sfc.getFieldName() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( sfc.getFieldType() ) ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( sfc.getFactType() ) ) ) );
         if ( sfc.getConnectives() != null ) {
             for ( int i = 0; i < sfc.getConnectives().length; i++ ) {
                 visit( sfc.getConnectives()[ i ] );
@@ -217,9 +221,9 @@ public class GuidedRuleModelIndexVisitor {
     }
 
     private void visitConnectiveConstraint( final ConnectiveConstraint cc ) {
-        builder.addField( new TypeField( cc.getFieldName(),
-                                         getFullyQualifiedClassName( cc.getFieldType() ),
-                                         getFullyQualifiedClassName( cc.getFactType() ) ) );
+        builder.addField( new TypeField( new FieldIndexTerm( cc.getFieldName() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( cc.getFieldType() ) ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( cc.getFactType() ) ) ) );
     }
 
     private void visitSingleFieldConstraint( final SingleFieldConstraintEBLeftSide sfexp ) {
@@ -234,9 +238,9 @@ public class GuidedRuleModelIndexVisitor {
 
     private void visit( final String fullyQualifiedClassName,
                         final ActionFieldValue afv ) {
-        builder.addField( new TypeField( afv.getField(),
-                                         getFullyQualifiedClassName( afv.getType() ),
-                                         fullyQualifiedClassName ) );
+        builder.addField( new TypeField( new FieldIndexTerm( afv.getField() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( afv.getType() ) ),
+                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {

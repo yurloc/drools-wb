@@ -26,19 +26,18 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.drools.workbench.screens.dtablexls.type.DecisionTableXLSResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
-import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
+import org.kie.workbench.common.services.refactoring.backend.server.query.QueryBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
@@ -71,11 +70,8 @@ public class IndexDecisionTableXLSMultipleTypesTest extends BaseIndexingTest<Dec
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
+            final Query query = new QueryBuilder().addTerm( new TypeIndexTerm( "org.drools.workbench.screens.dtablexls.backend.server.indexing.classes.Applicant" ) ).build();
 
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.drools.workbench.screens.dtablexls.backend.server.indexing.classes.applicant" ) ),
-                       BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -99,11 +95,8 @@ public class IndexDecisionTableXLSMultipleTypesTest extends BaseIndexingTest<Dec
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
+            final Query query = new QueryBuilder().addTerm( new TypeIndexTerm( "org.drools.workbench.screens.dtablexls.backend.server.indexing.classes.Mortgage" ) ).build();
 
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.TYPE_NAME.toString(),
-                                                "org.drools.workbench.screens.dtablexls.backend.server.indexing.classes.mortgage" ) ),
-                       BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -130,7 +123,7 @@ public class IndexDecisionTableXLSMultipleTypesTest extends BaseIndexingTest<Dec
     @Override
     public Map<String, Analyzer> getAnalyzers() {
         return new HashMap<String, Analyzer>() {{
-            put( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            put( RuleAttributeIndexTerm.TERM,
                  new RuleAttributeNameAnalyzer( LUCENE_40 ) );
         }};
     }

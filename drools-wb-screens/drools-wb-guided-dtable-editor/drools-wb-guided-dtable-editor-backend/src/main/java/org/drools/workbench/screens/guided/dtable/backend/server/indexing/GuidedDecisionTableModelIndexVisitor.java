@@ -40,6 +40,12 @@ import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.RuleAttribute;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
+import org.kie.workbench.common.services.refactoring.model.index.terms.FieldIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.ParentRuleIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeValueIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.validation.PortablePreconditions;
 
@@ -103,8 +109,8 @@ public class GuidedDecisionTableModelIndexVisitor {
         final String parentRuleName = model.getParentName();
         for ( List<DTCellValue52> row : model.getData() ) {
             final String ruleName = "Row " + row.get( 0 ).getNumericValue().longValue() + " " + model.getTableName();
-            builder.addRule( new Rule( ruleName,
-                                       parentRuleName ) );
+            builder.addRule( new Rule( new RuleIndexTerm( ruleName ),
+                                       ( parentRuleName == null ? null : new ParentRuleIndexTerm( parentRuleName ) ) ) );
         }
     }
 
@@ -113,14 +119,14 @@ public class GuidedDecisionTableModelIndexVisitor {
         for ( List<DTCellValue52> row : model.getData() ) {
             final String attributeValue = row.get( iCol ).getStringValue();
             if ( !( attributeValue == null || attributeValue.isEmpty() ) ) {
-                builder.addRuleAttribute( new RuleAttribute( o.getAttribute(),
-                                                             attributeValue ) );
+                builder.addRuleAttribute( new RuleAttribute( new RuleAttributeIndexTerm( o.getAttribute() ),
+                                                             new RuleAttributeValueIndexTerm( attributeValue ) ) );
             }
         }
     }
 
     private void visit( final Pattern52 o ) {
-        builder.addType( new Type( getFullyQualifiedClassName( o.getFactType() ) ) );
+        builder.addType( new Type( new TypeIndexTerm( getFullyQualifiedClassName( o.getFactType() ) ) ) );
         for ( ConditionCol52 c : o.getChildColumns() ) {
             visit( c );
         }
@@ -140,9 +146,9 @@ public class GuidedDecisionTableModelIndexVisitor {
     private void visit( final ConditionCol52 o ) {
         final Pattern52 p = model.getPattern( o );
         final String fullyQualifiedClassName = getFullyQualifiedClassName( p.getFactType() );
-        builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getFieldType() ),
-                                         fullyQualifiedClassName ) );
+        builder.addField( new TypeField( new FieldIndexTerm( o.getFactField() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( o.getFieldType() ) ),
+                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
     }
 
     private void visit( final BRLActionColumn o ) {
@@ -158,18 +164,18 @@ public class GuidedDecisionTableModelIndexVisitor {
 
     private void visit( final ActionInsertFactCol52 o ) {
         final String fullyQualifiedClassName = getFullyQualifiedClassName( o.getFactType() );
-        builder.addType( new Type( fullyQualifiedClassName ) );
-        builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getType() ),
-                                         fullyQualifiedClassName ) );
+        builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
+        builder.addField( new TypeField( new FieldIndexTerm( o.getFactField() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( o.getType() ) ),
+                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
     }
 
     private void visit( final ActionSetFieldCol52 o ) {
         final Pattern52 p = model.getConditionPattern( o.getBoundName() );
         final String fullyQualifiedClassName = getFullyQualifiedClassName( p.getFactType() );
-        builder.addField( new TypeField( o.getFactField(),
-                                         getFullyQualifiedClassName( o.getType() ),
-                                         fullyQualifiedClassName ) );
+        builder.addField( new TypeField( new FieldIndexTerm( o.getFactField() ),
+                                         new TypeIndexTerm( getFullyQualifiedClassName( o.getType() ) ),
+                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {

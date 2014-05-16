@@ -30,7 +30,7 @@ import javax.inject.Named;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
-import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
 import org.uberfire.metadata.backend.lucene.LuceneConfig;
 import org.uberfire.metadata.backend.lucene.LuceneConfigBuilder;
 import org.uberfire.metadata.engine.Indexer;
@@ -77,7 +77,7 @@ public class LuceneConfigProducer {
 
     private Map<String, Analyzer> getAnalyzers() {
         return new HashMap<String, Analyzer>() {{
-            put( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            put( RuleIndexTerm.TERM,
                  new RuleAttributeNameAnalyzer( LUCENE_40 ) );
         }};
     }

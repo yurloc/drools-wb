@@ -21,17 +21,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
-import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
+import org.kie.workbench.common.services.refactoring.backend.server.query.QueryBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.engine.Index;
@@ -62,9 +63,9 @@ public class IndexRuleTest extends BaseIndexingTest<GuidedRuleDRLResourceTypeDef
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
+            final Query query = new QueryBuilder().addTerm( new RuleIndexTerm( "myRule" ) ).build();
 
-            searcher.search( new TermQuery( new Term( IndexableElements.RULE_NAME.toString(),
-                                                      "myrule" ) ),
+            searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
@@ -83,7 +84,7 @@ public class IndexRuleTest extends BaseIndexingTest<GuidedRuleDRLResourceTypeDef
     @Override
     public Map<String, Analyzer> getAnalyzers() {
         return new HashMap<String, Analyzer>() {{
-            put( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            put( RuleAttributeIndexTerm.TERM,
                  new RuleAttributeNameAnalyzer( LUCENE_40 ) );
         }};
     }

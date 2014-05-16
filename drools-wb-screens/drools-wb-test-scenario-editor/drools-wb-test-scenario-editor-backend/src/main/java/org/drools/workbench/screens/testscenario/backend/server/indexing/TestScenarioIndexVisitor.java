@@ -36,6 +36,9 @@ import org.kie.workbench.common.services.refactoring.backend.server.indexing.Def
 import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
+import org.kie.workbench.common.services.refactoring.model.index.terms.FieldIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.validation.PortablePreconditions;
 
@@ -86,7 +89,7 @@ public class TestScenarioIndexVisitor {
             final FactData factData = (FactData) fixture;
             final String typeName = factData.getType();
             final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
-            builder.addType( new Type( fullyQualifiedClassName ) );
+            builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
 
             factDataToFullyQualifiedClassNameMap.put( factData.getName(),
                                                       fullyQualifiedClassName );
@@ -95,9 +98,9 @@ public class TestScenarioIndexVisitor {
                 final String fieldName = field.getName();
                 final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                              fieldName );
-                builder.addField( new TypeField( fieldName,
-                                                 fieldFullyQualifiedClassName,
-                                                 fullyQualifiedClassName ) );
+                builder.addField( new TypeField( new FieldIndexTerm( fieldName ),
+                                                 new TypeIndexTerm( fieldFullyQualifiedClassName ),
+                                                 new TypeIndexTerm( fullyQualifiedClassName ) ) );
             }
 
         } else if ( fixture instanceof VerifyFact ) {
@@ -112,20 +115,20 @@ public class TestScenarioIndexVisitor {
                 fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
             }
             if ( fullyQualifiedClassName != null ) {
-                builder.addType( new Type( fullyQualifiedClassName ) );
+                builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
             }
 
             for ( VerifyField field : verifyFact.getFieldValues() ) {
                 final String fieldName = field.getFieldName();
                 final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                              fieldName );
-                builder.addField( new TypeField( fieldName,
-                                                 fieldFullyQualifiedClassName,
-                                                 fullyQualifiedClassName ) );
+                builder.addField( new TypeField( new FieldIndexTerm( fieldName ),
+                                                 new TypeIndexTerm( fieldFullyQualifiedClassName ),
+                                                 new TypeIndexTerm( fullyQualifiedClassName ) ) );
             }
         } else if ( fixture instanceof VerifyRuleFired ) {
             final VerifyRuleFired verifyRuleFired = (VerifyRuleFired) fixture;
-            builder.addRule( new Rule( verifyRuleFired.getRuleName() ) );
+            builder.addRule( new Rule( new RuleIndexTerm( verifyRuleFired.getRuleName() ) ) );
         }
     }
 

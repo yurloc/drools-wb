@@ -23,19 +23,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
 import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
-import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
+import org.kie.workbench.common.services.refactoring.backend.server.query.QueryBuilder;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeValueIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
@@ -70,11 +69,8 @@ public class IndexRuleAttributeNameAndValueCompositionTest extends BaseIndexingT
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
+            final Query query = new QueryBuilder().addTerm( new RuleAttributeIndexTerm( "ruleflow-group" ) ).addTerm( new RuleAttributeValueIndexTerm( "myRuleFlowGroup" ) ).build();
 
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString() + ":ruleflow-group:" + IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
-                                                "myruleflowgroup" ) ),
-                       BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -96,11 +92,8 @@ public class IndexRuleAttributeNameAndValueCompositionTest extends BaseIndexingT
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
+            final Query query = new QueryBuilder().addTerm( new RuleAttributeIndexTerm( "ruleflow-group" ) ).addTerm( new RuleAttributeValueIndexTerm( "myAgendaGroup" ) ).build();
 
-            final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString() + ":ruleflow-group:" + IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
-                                                "myagendagroup" ) ),
-                       BooleanClause.Occur.MUST );
             searcher.search( query,
                              collector );
             final ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -120,7 +113,7 @@ public class IndexRuleAttributeNameAndValueCompositionTest extends BaseIndexingT
     @Override
     public Map<String, Analyzer> getAnalyzers() {
         return new HashMap<String, Analyzer>() {{
-            put( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            put( RuleAttributeIndexTerm.TERM,
                  new RuleAttributeNameAnalyzer( LUCENE_40 ) );
         }};
     }

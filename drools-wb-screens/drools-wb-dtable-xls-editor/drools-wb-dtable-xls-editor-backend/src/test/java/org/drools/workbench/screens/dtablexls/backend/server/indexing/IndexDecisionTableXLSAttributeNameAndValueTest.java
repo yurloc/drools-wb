@@ -38,7 +38,8 @@ import org.junit.Test;
 import org.kie.workbench.common.services.refactoring.backend.server.BaseIndexingTest;
 import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
-import org.kie.workbench.common.services.refactoring.model.index.IndexableElements;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeValueIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
@@ -76,10 +77,10 @@ public class IndexDecisionTableXLSAttributeNameAndValueTest extends BaseIndexing
                                                                                 true );
 
             final BooleanQuery query = new BooleanQuery();
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            query.add( new TermQuery( new Term( RuleAttributeIndexTerm.TERM,
                                                 "ruleflow-group" ) ),
                        BooleanClause.Occur.MUST );
-            query.add( new TermQuery( new Term( IndexableElements.RULE_ATTRIBUTE_VALUE.toString(),
+            query.add( new TermQuery( new Term( RuleAttributeValueIndexTerm.TERM,
                                                 "myruleflowgroup" ) ),
                        BooleanClause.Occur.MUST );
             searcher.search( query,
@@ -108,7 +109,7 @@ public class IndexDecisionTableXLSAttributeNameAndValueTest extends BaseIndexing
     @Override
     public Map<String, Analyzer> getAnalyzers() {
         return new HashMap<String, Analyzer>() {{
-            put( IndexableElements.RULE_ATTRIBUTE_NAME.toString(),
+            put( RuleAttributeIndexTerm.TERM,
                  new RuleAttributeNameAnalyzer( LUCENE_40 ) );
         }};
     }
