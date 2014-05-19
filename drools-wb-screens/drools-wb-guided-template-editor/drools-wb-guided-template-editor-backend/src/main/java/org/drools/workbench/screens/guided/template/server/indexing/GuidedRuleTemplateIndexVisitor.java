@@ -43,7 +43,6 @@ import org.kie.workbench.common.services.refactoring.model.index.Rule;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
 import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueFieldIndexTerm;
-import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueParentRuleIndexTerm;
 import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueRuleAttributeIndexTerm;
 import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueRuleAttributeValueIndexTerm;
 import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueRuleIndexTerm;
@@ -209,7 +208,7 @@ public class GuidedRuleTemplateIndexVisitor {
         for ( int i = 0; i < model.getRowsCount(); i++ ) {
             final String ruleName = model.name + "_" + i;
             builder.addRule( new Rule( new ValueRuleIndexTerm( ruleName ),
-                                       ( parentRuleName == null ? null : new ValueParentRuleIndexTerm( parentRuleName ) ) ) );
+                                       ( parentRuleName == null ? null : new ValueRuleIndexTerm( parentRuleName ) ) ) );
         }
 
     }
