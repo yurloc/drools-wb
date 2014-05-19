@@ -26,8 +26,8 @@ import org.kie.workbench.common.services.datamodel.backend.server.builder.util.D
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
-import org.kie.workbench.common.services.refactoring.model.index.terms.FieldIndexTerm;
-import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueFieldIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueTypeIndexTerm;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.validation.PortablePreconditions;
 
@@ -64,15 +64,15 @@ public class EnumIndexVisitor {
             //Add type
             final String typeName = getTypeName( e.getKey() );
             final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
-            builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
+            builder.addType( new Type( new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
 
             //Add field
             final String fieldName = getFieldName( e.getKey() );
             final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                          fieldName );
-            builder.addField( new TypeField( new FieldIndexTerm( fieldName ),
-                                             new TypeIndexTerm( fieldFullyQualifiedClassName ),
-                                             new TypeIndexTerm( fullyQualifiedClassName ) ) );
+            builder.addField( new TypeField( new ValueFieldIndexTerm( fieldName ),
+                                             new ValueTypeIndexTerm( fieldFullyQualifiedClassName ),
+                                             new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
         }
 
         results.addAll( builder.build() );

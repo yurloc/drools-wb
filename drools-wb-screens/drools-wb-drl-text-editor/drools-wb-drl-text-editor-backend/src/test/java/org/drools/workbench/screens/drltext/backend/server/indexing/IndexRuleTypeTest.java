@@ -32,7 +32,7 @@ import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.backend.server.query.QueryBuilder;
 import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
-import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueTypeIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.engine.Index;
@@ -67,7 +67,7 @@ public class IndexRuleTypeTest extends BaseIndexingTest<DRLResourceTypeDefinitio
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
-            final Query query = new QueryBuilder().addTerm( new TypeIndexTerm( "org.drools.workbench.screens.drltext.backend.server.indexing.classes.Applicant" ) ).build();
+            final Query query = new QueryBuilder().addTerm( new ValueTypeIndexTerm( "org.drools.workbench.screens.drltext.backend.server.indexing.classes.Applicant" ) ).build();
 
             searcher.search( query,
                              collector );
@@ -84,7 +84,7 @@ public class IndexRuleTypeTest extends BaseIndexingTest<DRLResourceTypeDefinitio
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
-            final Query query = new QueryBuilder().useWildcards().addTerm( new TypeIndexTerm( "*.Applicant" ) ).build();
+            final Query query = new QueryBuilder().useWildcards().addTerm( new ValueTypeIndexTerm( "*.Applicant" ) ).build();
 
             searcher.search( query,
                              collector );

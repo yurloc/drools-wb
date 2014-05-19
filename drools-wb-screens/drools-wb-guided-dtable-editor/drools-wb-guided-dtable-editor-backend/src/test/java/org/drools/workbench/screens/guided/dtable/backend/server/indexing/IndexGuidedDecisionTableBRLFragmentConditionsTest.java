@@ -37,7 +37,7 @@ import org.kie.workbench.common.services.refactoring.backend.server.TestIndexer;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.backend.server.query.QueryBuilder;
 import org.kie.workbench.common.services.refactoring.model.index.terms.RuleAttributeIndexTerm;
-import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueTypeIndexTerm;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.metadata.backend.lucene.util.KObjectUtil;
@@ -76,7 +76,7 @@ public class IndexGuidedDecisionTableBRLFragmentConditionsTest extends BaseIndex
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
-            final Query query = new QueryBuilder().addTerm( new TypeIndexTerm( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Applicant" ) ).build();
+            final Query query = new QueryBuilder().addTerm( new ValueTypeIndexTerm( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Applicant" ) ).build();
 
             searcher.search( query,
                              collector );
@@ -98,7 +98,7 @@ public class IndexGuidedDecisionTableBRLFragmentConditionsTest extends BaseIndex
             final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
             final TopScoreDocCollector collector = TopScoreDocCollector.create( 10,
                                                                                 true );
-            final Query query = new QueryBuilder().addTerm( new TypeIndexTerm( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Mortgage" ) ).build();
+            final Query query = new QueryBuilder().addTerm( new ValueTypeIndexTerm( "org.drools.workbench.screens.guided.dtable.backend.server.indexing.classes.Mortgage" ) ).build();
 
             searcher.search( query,
                              collector );

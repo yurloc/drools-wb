@@ -26,8 +26,8 @@ import org.drools.workbench.models.guided.scorecard.shared.ScoreCardModel;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.DefaultIndexBuilder;
 import org.kie.workbench.common.services.refactoring.model.index.Type;
 import org.kie.workbench.common.services.refactoring.model.index.TypeField;
-import org.kie.workbench.common.services.refactoring.model.index.terms.FieldIndexTerm;
-import org.kie.workbench.common.services.refactoring.model.index.terms.TypeIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueFieldIndexTerm;
+import org.kie.workbench.common.services.refactoring.model.index.terms.valueterms.ValueTypeIndexTerm;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.validation.PortablePreconditions;
 
@@ -55,15 +55,15 @@ public class GuidedScoreCardIndexVisitor {
         //Add type
         final String typeName = model.getFactName();
         final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
-        builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
+        builder.addType( new Type( new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
 
         //Add field
         final String fieldName = model.getFieldName();
         final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                      fieldName );
-        builder.addField( new TypeField( new FieldIndexTerm( fieldName ),
-                                         new TypeIndexTerm( fieldFullyQualifiedClassName ),
-                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
+        builder.addField( new TypeField( new ValueFieldIndexTerm( fieldName ),
+                                         new ValueTypeIndexTerm( fieldFullyQualifiedClassName ),
+                                         new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
 
         //Add Characteristics
         for ( Characteristic c : model.getCharacteristics() ) {
@@ -77,15 +77,15 @@ public class GuidedScoreCardIndexVisitor {
         //Add type
         final String typeName = c.getFact();
         final String fullyQualifiedClassName = getFullyQualifiedClassName( typeName );
-        builder.addType( new Type( new TypeIndexTerm( fullyQualifiedClassName ) ) );
+        builder.addType( new Type( new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
 
         //Add field
         final String fieldName = c.getField();
         final String fieldFullyQualifiedClassName = getFieldFullyQualifiedClassName( fullyQualifiedClassName,
                                                                                      fieldName );
-        builder.addField( new TypeField( new FieldIndexTerm( fieldName ),
-                                         new TypeIndexTerm( fieldFullyQualifiedClassName ),
-                                         new TypeIndexTerm( fullyQualifiedClassName ) ) );
+        builder.addField( new TypeField( new ValueFieldIndexTerm( fieldName ),
+                                         new ValueTypeIndexTerm( fieldFullyQualifiedClassName ),
+                                         new ValueTypeIndexTerm( fullyQualifiedClassName ) ) );
     }
 
     private String getFullyQualifiedClassName( final String typeName ) {
