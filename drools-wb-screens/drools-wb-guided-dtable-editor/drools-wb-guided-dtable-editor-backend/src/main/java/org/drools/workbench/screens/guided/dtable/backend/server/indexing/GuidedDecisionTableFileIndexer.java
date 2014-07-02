@@ -18,10 +18,12 @@ package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.screens.guided.dtable.type.GuidedDTableResourceTypeDefinition;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -42,13 +44,13 @@ public class GuidedDecisionTableFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     protected GuidedDTableResourceTypeDefinition type;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -60,11 +62,11 @@ public class GuidedDecisionTableFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String content = ioService.readAllString( path );
+            final String content = ioServiceProvider.get().readAllString( path );
             final GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal( content );
 
-            final Project project = projectService.resolveProject( Paths.convert( path ) );
-            final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );

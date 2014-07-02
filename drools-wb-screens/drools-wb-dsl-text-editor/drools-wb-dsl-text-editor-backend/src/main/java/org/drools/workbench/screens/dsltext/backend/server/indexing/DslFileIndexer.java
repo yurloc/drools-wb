@@ -21,6 +21,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
@@ -28,6 +29,7 @@ import org.drools.compiler.lang.dsl.DSLMappingEntry;
 import org.drools.compiler.lang.dsl.DSLTokenizedMappingFile;
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.dsltext.type.DSLResourceTypeDefinition;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -52,16 +54,16 @@ public class DslFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
 
     @Inject
-    private DataModelService dataModelService;
+    private Provider<DataModelService> dataModelServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     protected DSLResourceTypeDefinition dslType;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -75,7 +77,7 @@ public class DslFileIndexer implements Indexer {
         try {
             final List<String> lhs = new ArrayList<String>();
             final List<String> rhs = new ArrayList<String>();
-            final String dsl = ioService.readAllString( path );
+            final String dsl = ioServiceProvider.get().readAllString( path );
 
             //Construct a dummy DRL file to parse index elements
             final DSLTokenizedMappingFile dslLoader = new DSLTokenizedMappingFile();
@@ -102,8 +104,8 @@ public class DslFileIndexer implements Indexer {
                     return index;
                 }
 
-                final Project project = projectService.resolveProject( Paths.convert( path ) );
-                final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+                final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+                final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
                 //Don't include rules created to parse DSL
                 final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
@@ -139,12 +141,12 @@ public class DslFileIndexer implements Indexer {
 
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
-        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
+        return projectServiceProvider.get().resolvePackage( Paths.convert( path ) ).getPackageName();
     }
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelService.getProjectDataModel( Paths.convert( path ) );
+        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
     }
 
     private String makeDrl( final Path path,

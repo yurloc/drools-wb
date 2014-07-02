@@ -23,6 +23,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.Expander;
@@ -33,6 +34,7 @@ import org.drools.compiler.lang.dsl.DefaultExpander;
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDSLRResourceTypeDefinition;
 import org.guvnor.common.services.backend.file.FileDiscoveryService;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -58,19 +60,19 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
 
     @Inject
-    private DataModelService dataModelService;
+    private Provider<DataModelService> dataModelServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     private FileDiscoveryService fileDiscoveryService;
 
     @Inject
     private GuidedRuleDSLRResourceTypeDefinition dslrType;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -82,7 +84,7 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
 
         KObject index = null;
         try {
-            final String dslr = ioService.readAllString( path );
+            final String dslr = ioServiceProvider.get().readAllString( path );
             final Expander expander = getDSLExpander( path );
             final String drl = expander.expand( dslr );
             final DrlParser drlParser = new DrlParser();
@@ -94,8 +96,8 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
             }
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectService.resolveProject( Paths.convert( path ) );
-            final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -135,12 +137,12 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
     private List<DSLMappingFile> getDSLMappingFiles( final Path path ) {
         final List<DSLMappingFile> dsls = new ArrayList<DSLMappingFile>();
         final org.uberfire.backend.vfs.Path vfsPath = Paths.convert( path );
-        final org.uberfire.backend.vfs.Path packagePath = projectService.resolvePackage( vfsPath ).getPackageMainResourcesPath();
+        final org.uberfire.backend.vfs.Path packagePath = projectServiceProvider.get().resolvePackage( vfsPath ).getPackageMainResourcesPath();
         final Path nioPackagePath = Paths.convert( packagePath );
         final Collection<Path> dslPaths = fileDiscoveryService.discoverFiles( nioPackagePath,
                                                                               FILTER_DSLS );
         for ( final Path dslPath : dslPaths ) {
-            final String dslDefinition = ioService.readAllString( dslPath );
+            final String dslDefinition = ioServiceProvider.get().readAllString( dslPath );
             final DSLTokenizedMappingFile dslFile = new DSLTokenizedMappingFile();
             try {
                 if ( dslFile.parseAndLoad( new StringReader( dslDefinition ) ) ) {
@@ -157,7 +159,7 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelService.getProjectDataModel( Paths.convert( path ) );
+        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
     }
 
 }

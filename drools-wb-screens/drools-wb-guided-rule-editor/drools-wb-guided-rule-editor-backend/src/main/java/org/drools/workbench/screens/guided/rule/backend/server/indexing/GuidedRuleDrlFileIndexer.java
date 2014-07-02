@@ -18,11 +18,13 @@ package org.drools.workbench.screens.guided.rule.backend.server.indexing;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.guided.rule.type.GuidedRuleDRLResourceTypeDefinition;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -45,16 +47,16 @@ public class GuidedRuleDrlFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
 
     @Inject
-    private DataModelService dataModelService;
+    private Provider<DataModelService> dataModelServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     protected GuidedRuleDRLResourceTypeDefinition type;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -66,7 +68,7 @@ public class GuidedRuleDrlFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String drl = ioService.readAllString( path );
+            final String drl = ioServiceProvider.get().readAllString( path );
             final DrlParser drlParser = new DrlParser();
             final PackageDescr packageDescr = drlParser.parse( true,
                                                                drl );
@@ -76,8 +78,8 @@ public class GuidedRuleDrlFileIndexer implements Indexer {
             }
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectService.resolveProject( Paths.convert( path ) );
-            final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -104,7 +106,7 @@ public class GuidedRuleDrlFileIndexer implements Indexer {
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelService.getProjectDataModel( Paths.convert( path ) );
+        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
     }
 
 }

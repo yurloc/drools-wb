@@ -20,12 +20,14 @@ import java.io.InputStream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DecisionTableFactory;
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.dtablexls.type.DecisionTableXLSResourceTypeDefinition;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -49,16 +51,16 @@ public class DecisionTableXLSFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
 
     @Inject
-    private DataModelService dataModelService;
+    private Provider<DataModelService> dataModelServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     protected DecisionTableXLSResourceTypeDefinition type;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -71,8 +73,8 @@ public class DecisionTableXLSFileIndexer implements Indexer {
         InputStream inputStream = null;
 
         try {
-            inputStream = ioService.newInputStream( path,
-                                                    StandardOpenOption.READ );
+            inputStream = ioServiceProvider.get().newInputStream( path,
+                                                                  StandardOpenOption.READ );
             final String drl = DecisionTableFactory.loadFromInputStream( inputStream,
                                                                          null );
             final DrlParser drlParser = new DrlParser();
@@ -84,8 +86,8 @@ public class DecisionTableXLSFileIndexer implements Indexer {
             }
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectService.resolveProject( Paths.convert( path ) );
-            final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -119,7 +121,7 @@ public class DecisionTableXLSFileIndexer implements Indexer {
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelService.getProjectDataModel( Paths.convert( path ) );
+        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
     }
 
 }

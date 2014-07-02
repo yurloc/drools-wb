@@ -18,11 +18,13 @@ package org.drools.workbench.screens.testscenario.backend.server.indexing;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.models.testscenarios.backend.util.ScenarioXMLPersistence;
 import org.drools.workbench.models.testscenarios.shared.Scenario;
 import org.drools.workbench.screens.testscenario.type.TestScenarioResourceTypeDefinition;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.kie.uberfire.metadata.engine.Indexer;
@@ -44,16 +46,16 @@ public class TestScenarioFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected IOService ioService;
+    protected Provider<IOService> ioServiceProvider;
 
     @Inject
-    private DataModelService dataModelService;
+    private Provider<DataModelService> dataModelServiceProvider;
+
+    @Inject
+    protected Provider<ProjectService> projectServiceProvider;
 
     @Inject
     protected TestScenarioResourceTypeDefinition type;
-
-    @Inject
-    protected ProjectService projectService;
 
     @Override
     public boolean supportsPath( final Path path ) {
@@ -65,12 +67,12 @@ public class TestScenarioFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String content = ioService.readAllString( path );
+            final String content = ioServiceProvider.get().readAllString( path );
             final Scenario model = ScenarioXMLPersistence.getInstance().unmarshal( content );
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectService.resolveProject( Paths.convert( path ) );
-            final org.guvnor.common.services.project.model.Package pkg = projectService.resolvePackage( Paths.convert( path ) );
+            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
+            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -98,12 +100,12 @@ public class TestScenarioFileIndexer implements Indexer {
 
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
-        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
+        return projectServiceProvider.get().resolvePackage( Paths.convert( path ) ).getPackageName();
     }
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelService.getProjectDataModel( Paths.convert( path ) );
+        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
     }
 
 }

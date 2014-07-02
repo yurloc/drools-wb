@@ -17,6 +17,7 @@ package org.drools.workbench.screens.dtablexls.backend.server.indexing;
 
 import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Provider;
 
 import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -36,18 +37,18 @@ import org.uberfire.java.nio.file.Path;
 public class TestDecisionTableXLSFileIndexer extends DecisionTableXLSFileIndexer implements TestIndexer<DecisionTableXLSResourceTypeDefinition> {
 
     @Override
-    public void setIOService( final IOService ioService ) {
-        this.ioService = ioService;
+    public void setIOServiceProvider( final Provider<IOService> ioServiceProvider ) {
+        this.ioServiceProvider = ioServiceProvider;
+    }
+
+    @Override
+    public void setProjectServiceProvider( final Provider<ProjectService> projectServiceProvider ) {
+        this.projectServiceProvider = projectServiceProvider;
     }
 
     @Override
     public void setResourceTypeDefinition( final DecisionTableXLSResourceTypeDefinition type ) {
         this.type = type;
-    }
-
-    @Override
-    public void setProjectService( final ProjectService projectService ) {
-        this.projectService = projectService;
     }
 
     @Override

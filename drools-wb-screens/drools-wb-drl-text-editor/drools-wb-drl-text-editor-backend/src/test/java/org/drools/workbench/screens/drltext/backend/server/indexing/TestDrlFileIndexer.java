@@ -17,6 +17,7 @@ package org.drools.workbench.screens.drltext.backend.server.indexing;
 
 import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Provider;
 
 import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -36,18 +37,18 @@ import org.uberfire.java.nio.file.Path;
 public class TestDrlFileIndexer extends DrlFileIndexer implements TestIndexer<DRLResourceTypeDefinition> {
 
     @Override
-    public void setIOService( final IOService ioService ) {
-        this.ioService = ioService;
+    public void setIOServiceProvider( final Provider<IOService> ioServiceProvider ) {
+        this.ioServiceProvider = ioServiceProvider;
+    }
+
+    @Override
+    public void setProjectServiceProvider( final Provider<ProjectService> projectServiceProvider ) {
+        this.projectServiceProvider = projectServiceProvider;
     }
 
     @Override
     public void setResourceTypeDefinition( final DRLResourceTypeDefinition type ) {
         this.drlType = type;
-    }
-
-    @Override
-    public void setProjectService( final ProjectService projectService ) {
-        this.projectService = projectService;
     }
 
     @Override
