@@ -33,12 +33,16 @@ import org.kie.uberfire.metadata.backend.lucene.LuceneConfig;
 import org.kie.uberfire.metadata.backend.lucene.LuceneConfigBuilder;
 import org.kie.uberfire.metadata.backend.lucene.analyzer.FilenameAnalyzer;
 import org.kie.uberfire.metadata.engine.Indexer;
+import org.kie.uberfire.metadata.io.IndexersFactory;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.model.index.terms.ProjectRootPathIndexTerm;
 import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
+import org.uberfire.commons.services.cdi.Startup;
+import org.uberfire.commons.services.cdi.StartupType;
 
 import static org.apache.lucene.util.Version.*;
 
+@Startup(StartupType.EAGER)
 @ApplicationScoped
 public class LuceneConfigProducer {
 
@@ -50,14 +54,16 @@ public class LuceneConfigProducer {
 
     @PostConstruct
     public void setup() {
-        final Set<Indexer> indexers = getIndexers();
         final Map<String, Analyzer> analyzers = getAnalyzers();
         this.config = new LuceneConfigBuilder().withInMemoryMetaModelStore()
-                .usingIndexers( indexers )
                 .usingAnalyzers( analyzers )
                 .useDirectoryBasedIndex()
                 .useNIODirectory()
                 .build();
+
+        for ( Indexer indexer : getIndexers() ) {
+            IndexersFactory.addIndexer( indexer );
+        }
     }
 
     @Produces
