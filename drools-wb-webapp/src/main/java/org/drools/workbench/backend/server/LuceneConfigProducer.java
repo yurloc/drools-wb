@@ -15,40 +15,25 @@
  */
 package org.drools.workbench.backend.server;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.kie.uberfire.metadata.backend.lucene.LuceneConfig;
 import org.kie.uberfire.metadata.backend.lucene.LuceneConfigBuilder;
 import org.kie.uberfire.metadata.backend.lucene.analyzer.FilenameAnalyzer;
-import org.kie.uberfire.metadata.engine.Indexer;
-import org.kie.uberfire.metadata.io.IndexersFactory;
 import org.kie.workbench.common.services.refactoring.backend.server.indexing.RuleAttributeNameAnalyzer;
 import org.kie.workbench.common.services.refactoring.model.index.terms.ProjectRootPathIndexTerm;
 import org.kie.workbench.common.services.refactoring.model.index.terms.RuleIndexTerm;
-import org.uberfire.commons.services.cdi.Startup;
-import org.uberfire.commons.services.cdi.StartupType;
 
 import static org.apache.lucene.util.Version.*;
 
-@Startup(StartupType.EAGER)
 @ApplicationScoped
 public class LuceneConfigProducer {
-
-    @Inject
-    @Any
-    private Instance<Indexer> indexers;
 
     private LuceneConfig config;
 
@@ -60,27 +45,12 @@ public class LuceneConfigProducer {
                 .useDirectoryBasedIndex()
                 .useNIODirectory()
                 .build();
-
-        for ( Indexer indexer : getIndexers() ) {
-            IndexersFactory.addIndexer( indexer );
-        }
     }
 
     @Produces
     @Named("luceneConfig")
     public LuceneConfig configProducer() {
         return this.config;
-    }
-
-    private Set<Indexer> getIndexers() {
-        if ( indexers == null ) {
-            return Collections.emptySet();
-        }
-        final Set<Indexer> result = new HashSet<Indexer>();
-        for ( Indexer indexer : indexers ) {
-            result.add( indexer );
-        }
-        return result;
     }
 
     private Map<String, Analyzer> getAnalyzers() {
