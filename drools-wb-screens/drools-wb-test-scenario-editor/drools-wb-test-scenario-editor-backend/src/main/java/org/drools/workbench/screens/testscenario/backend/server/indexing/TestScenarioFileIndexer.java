@@ -16,9 +16,9 @@
 package org.drools.workbench.screens.testscenario.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.models.testscenarios.backend.util.ScenarioXMLPersistence;
@@ -46,13 +46,13 @@ public class TestScenarioFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    private Provider<DataModelService> dataModelServiceProvider;
+    private Instance<DataModelService> dataModelServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected TestScenarioResourceTypeDefinition type;

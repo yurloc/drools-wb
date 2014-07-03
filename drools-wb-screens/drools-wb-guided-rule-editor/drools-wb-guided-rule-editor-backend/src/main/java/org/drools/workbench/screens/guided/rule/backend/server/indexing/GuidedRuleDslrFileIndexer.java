@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.Expander;
@@ -60,13 +60,13 @@ public class GuidedRuleDslrFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    private Provider<DataModelService> dataModelServiceProvider;
+    private Instance<DataModelService> dataModelServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     private FileDiscoveryService fileDiscoveryService;

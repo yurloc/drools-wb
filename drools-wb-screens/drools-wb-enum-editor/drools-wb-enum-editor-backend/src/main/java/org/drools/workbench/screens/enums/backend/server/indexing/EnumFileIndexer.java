@@ -16,9 +16,9 @@
 package org.drools.workbench.screens.enums.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.drools.workbench.screens.enums.type.EnumResourceTypeDefinition;
@@ -45,13 +45,13 @@ public class EnumFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    private Provider<DataModelService> dataModelServiceProvider;
+    private Instance<DataModelService> dataModelServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected EnumResourceTypeDefinition type;

@@ -16,9 +16,9 @@
 package org.drools.workbench.screens.guided.template.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
@@ -44,10 +44,10 @@ public class GuidedRuleTemplateFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected GuidedRuleTemplateResourceTypeDefinition type;

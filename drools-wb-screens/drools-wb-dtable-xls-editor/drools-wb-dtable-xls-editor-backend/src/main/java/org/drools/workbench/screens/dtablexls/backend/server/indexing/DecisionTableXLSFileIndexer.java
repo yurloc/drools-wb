@@ -18,9 +18,9 @@ package org.drools.workbench.screens.dtablexls.backend.server.indexing;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DecisionTableFactory;
 import org.drools.compiler.compiler.DrlParser;
@@ -51,13 +51,13 @@ public class DecisionTableXLSFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    private Provider<DataModelService> dataModelServiceProvider;
+    private Instance<DataModelService> dataModelServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected DecisionTableXLSResourceTypeDefinition type;

@@ -17,7 +17,7 @@ package org.drools.workbench.screens.globals.backend.server.util.indexing;
 
 import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Provider;
+import javax.enterprise.inject.Instance;
 
 import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -38,12 +38,12 @@ import org.uberfire.java.nio.file.Path;
 public class TestGlobalsFileIndexer extends GlobalsFileIndexer implements TestIndexer<GlobalResourceTypeDefinition> {
 
     @Override
-    public void setIOServiceProvider( final Provider<IOService> ioServiceProvider ) {
+    public void setIOServiceProvider( final Instance<IOService> ioServiceProvider ) {
         this.ioServiceProvider = ioServiceProvider;
     }
 
     @Override
-    public void setProjectServiceProvider( final Provider<ProjectService> projectServiceProvider ) {
+    public void setProjectServiceProvider( final Instance<ProjectService> projectServiceProvider ) {
         this.projectServiceProvider = projectServiceProvider;
     }
 

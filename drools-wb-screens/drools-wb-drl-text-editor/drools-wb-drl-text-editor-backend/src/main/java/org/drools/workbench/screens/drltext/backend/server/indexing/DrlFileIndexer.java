@@ -16,9 +16,9 @@
 package org.drools.workbench.screens.drltext.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.compiler.compiler.DrlParser;
 import org.drools.compiler.lang.descr.PackageDescr;
@@ -47,13 +47,13 @@ public class DrlFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    protected Provider<DataModelService> dataModelServiceProvider;
+    protected Instance<DataModelService> dataModelServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected DRLResourceTypeDefinition drlType;

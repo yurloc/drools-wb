@@ -17,7 +17,7 @@ package org.drools.workbench.screens.guided.rule.backend.server.indexing;
 
 import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Provider;
+import javax.enterprise.inject.Instance;
 
 import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -37,12 +37,12 @@ import org.uberfire.java.nio.file.Path;
 public class TestGuidedRuleDrlFileIndexer extends GuidedRuleDrlFileIndexer implements TestIndexer<GuidedRuleDRLResourceTypeDefinition> {
 
     @Override
-    public void setIOServiceProvider( final Provider<IOService> ioServiceProvider ) {
+    public void setIOServiceProvider( final Instance<IOService> ioServiceProvider ) {
         this.ioServiceProvider = ioServiceProvider;
     }
 
     @Override
-    public void setProjectServiceProvider( final Provider<ProjectService> projectServiceProvider ) {
+    public void setProjectServiceProvider( final Instance<ProjectService> projectServiceProvider ) {
         this.projectServiceProvider = projectServiceProvider;
     }
 

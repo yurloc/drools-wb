@@ -16,9 +16,9 @@
 package org.drools.workbench.screens.guided.dtable.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
@@ -44,10 +44,10 @@ public class GuidedDecisionTableFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Provider<IOService> ioServiceProvider;
+    protected Instance<IOService> ioServiceProvider;
 
     @Inject
-    protected Provider<ProjectService> projectServiceProvider;
+    protected Instance<ProjectService> projectServiceProvider;
 
     @Inject
     protected GuidedDTableResourceTypeDefinition type;
