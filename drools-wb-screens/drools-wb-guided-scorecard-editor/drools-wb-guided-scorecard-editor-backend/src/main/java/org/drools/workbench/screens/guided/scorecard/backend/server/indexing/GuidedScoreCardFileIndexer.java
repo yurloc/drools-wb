@@ -16,7 +16,6 @@
 package org.drools.workbench.screens.guided.scorecard.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,13 +45,13 @@ public class GuidedScoreCardFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    private Instance<DataModelService> dataModelServiceProvider;
+    private DataModelService dataModelService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected GuidedScoreCardResourceTypeDefinition type;
@@ -67,12 +66,12 @@ public class GuidedScoreCardFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String content = ioServiceProvider.get().readAllString( path );
+            final String content = ioService.readAllString( path );
             final ScoreCardModel model = GuidedScoreCardXMLPersistence.getInstance().unmarshall( content );
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+            final Project project = projectService.resolveProject( Paths.convert( path ) );
+            final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -99,7 +98,7 @@ public class GuidedScoreCardFileIndexer implements Indexer {
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }

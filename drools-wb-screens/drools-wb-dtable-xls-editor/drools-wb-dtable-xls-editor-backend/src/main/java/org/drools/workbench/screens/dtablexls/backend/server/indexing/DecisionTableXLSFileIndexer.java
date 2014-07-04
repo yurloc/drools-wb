@@ -18,7 +18,6 @@ package org.drools.workbench.screens.dtablexls.backend.server.indexing;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -51,13 +50,13 @@ public class DecisionTableXLSFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    private Instance<DataModelService> dataModelServiceProvider;
+    private DataModelService dataModelService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected DecisionTableXLSResourceTypeDefinition type;
@@ -73,8 +72,8 @@ public class DecisionTableXLSFileIndexer implements Indexer {
         InputStream inputStream = null;
 
         try {
-            inputStream = ioServiceProvider.get().newInputStream( path,
-                                                                  StandardOpenOption.READ );
+            inputStream = ioService.newInputStream( path,
+                                                    StandardOpenOption.READ );
             final String drl = DecisionTableFactory.loadFromInputStream( inputStream,
                                                                          null );
             final DrlParser drlParser = new DrlParser();
@@ -86,8 +85,8 @@ public class DecisionTableXLSFileIndexer implements Indexer {
             }
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+            final Project project = projectService.resolveProject( Paths.convert( path ) );
+            final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -121,7 +120,7 @@ public class DecisionTableXLSFileIndexer implements Indexer {
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }

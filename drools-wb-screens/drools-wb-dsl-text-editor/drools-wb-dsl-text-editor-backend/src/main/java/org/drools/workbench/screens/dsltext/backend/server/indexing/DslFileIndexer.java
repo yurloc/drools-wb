@@ -19,7 +19,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -54,13 +53,13 @@ public class DslFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    private Instance<DataModelService> dataModelServiceProvider;
+    private DataModelService dataModelService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected DSLResourceTypeDefinition dslType;
@@ -77,7 +76,7 @@ public class DslFileIndexer implements Indexer {
         try {
             final List<String> lhs = new ArrayList<String>();
             final List<String> rhs = new ArrayList<String>();
-            final String dsl = ioServiceProvider.get().readAllString( path );
+            final String dsl = ioService.readAllString( path );
 
             //Construct a dummy DRL file to parse index elements
             final DSLTokenizedMappingFile dslLoader = new DSLTokenizedMappingFile();
@@ -104,8 +103,8 @@ public class DslFileIndexer implements Indexer {
                     return index;
                 }
 
-                final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-                final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+                final Project project = projectService.resolveProject( Paths.convert( path ) );
+                final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
                 //Don't include rules created to parse DSL
                 final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
@@ -141,12 +140,12 @@ public class DslFileIndexer implements Indexer {
 
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
-        return projectServiceProvider.get().resolvePackage( Paths.convert( path ) ).getPackageName();
+        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
     }
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
     private String makeDrl( final Path path,

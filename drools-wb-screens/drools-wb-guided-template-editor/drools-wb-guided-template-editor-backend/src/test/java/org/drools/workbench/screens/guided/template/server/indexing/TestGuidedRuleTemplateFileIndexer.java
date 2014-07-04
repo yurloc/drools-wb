@@ -16,7 +16,6 @@
 package org.drools.workbench.screens.guided.template.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 
 import org.drools.workbench.screens.guided.template.type.GuidedRuleTemplateResourceTypeDefinition;
 import org.guvnor.common.services.project.service.ProjectService;
@@ -30,13 +29,13 @@ import org.uberfire.io.IOService;
 public class TestGuidedRuleTemplateFileIndexer extends GuidedRuleTemplateFileIndexer implements TestIndexer<GuidedRuleTemplateResourceTypeDefinition> {
 
     @Override
-    public void setIOServiceProvider( final Instance<IOService> ioServiceProvider ) {
-        this.ioServiceProvider = ioServiceProvider;
+    public void setIOService( final IOService ioService ) {
+        this.ioService = ioService;
     }
 
     @Override
-    public void setProjectServiceProvider( final Instance<ProjectService> projectServiceProvider ) {
-        this.projectServiceProvider = projectServiceProvider;
+    public void setProjectService( final ProjectService projectService ) {
+        this.projectService = projectService;
     }
 
     @Override

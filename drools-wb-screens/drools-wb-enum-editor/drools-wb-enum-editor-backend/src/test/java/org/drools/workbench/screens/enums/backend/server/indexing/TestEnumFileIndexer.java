@@ -17,7 +17,6 @@ package org.drools.workbench.screens.enums.backend.server.indexing;
 
 import java.util.HashMap;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 
 import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleImpl;
 import org.drools.workbench.models.datamodel.oracle.DataType;
@@ -37,13 +36,13 @@ import org.uberfire.java.nio.file.Path;
 public class TestEnumFileIndexer extends EnumFileIndexer implements TestIndexer<EnumResourceTypeDefinition> {
 
     @Override
-    public void setIOServiceProvider( final Instance<IOService> ioServiceProvider ) {
-        this.ioServiceProvider = ioServiceProvider;
+    public void setIOService( final IOService ioService ) {
+        this.ioService = ioService;
     }
 
     @Override
-    public void setProjectServiceProvider( final Instance<ProjectService> projectServiceProvider ) {
-        this.projectServiceProvider = projectServiceProvider;
+    public void setProjectService( final ProjectService projectService ) {
+        this.projectService = projectService;
     }
 
     @Override

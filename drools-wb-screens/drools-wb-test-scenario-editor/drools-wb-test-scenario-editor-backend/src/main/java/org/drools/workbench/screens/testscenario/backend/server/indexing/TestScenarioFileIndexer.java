@@ -16,7 +16,6 @@
 package org.drools.workbench.screens.testscenario.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,13 +45,13 @@ public class TestScenarioFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    private Instance<DataModelService> dataModelServiceProvider;
+    private DataModelService dataModelService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected TestScenarioResourceTypeDefinition type;
@@ -67,12 +66,12 @@ public class TestScenarioFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String content = ioServiceProvider.get().readAllString( path );
+            final String content = ioService.readAllString( path );
             final Scenario model = ScenarioXMLPersistence.getInstance().unmarshal( content );
 
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+            final Project project = projectService.resolveProject( Paths.convert( path ) );
+            final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -100,12 +99,12 @@ public class TestScenarioFileIndexer implements Indexer {
 
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
-        return projectServiceProvider.get().resolvePackage( Paths.convert( path ) ).getPackageName();
+        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
     }
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }

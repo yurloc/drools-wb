@@ -16,7 +16,6 @@
 package org.drools.workbench.screens.guided.template.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -44,10 +43,10 @@ public class GuidedRuleTemplateFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected GuidedRuleTemplateResourceTypeDefinition type;
@@ -62,11 +61,11 @@ public class GuidedRuleTemplateFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String content = ioServiceProvider.get().readAllString( path );
+            final String content = ioService.readAllString( path );
             final TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal( content );
 
-            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+            final Project project = projectService.resolveProject( Paths.convert( path ) );
+            final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );

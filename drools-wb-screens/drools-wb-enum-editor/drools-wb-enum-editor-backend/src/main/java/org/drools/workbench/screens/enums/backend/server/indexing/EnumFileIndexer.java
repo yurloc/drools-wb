@@ -16,7 +16,6 @@
 package org.drools.workbench.screens.enums.backend.server.indexing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -45,13 +44,13 @@ public class EnumFileIndexer implements Indexer {
 
     @Inject
     @Named("ioStrategy")
-    protected Instance<IOService> ioServiceProvider;
+    protected IOService ioService;
 
     @Inject
-    private Instance<DataModelService> dataModelServiceProvider;
+    private DataModelService dataModelService;
 
     @Inject
-    protected Instance<ProjectService> projectServiceProvider;
+    protected ProjectService projectService;
 
     @Inject
     protected EnumResourceTypeDefinition type;
@@ -66,7 +65,7 @@ public class EnumFileIndexer implements Indexer {
         KObject index = null;
 
         try {
-            final String enumDefinition = ioServiceProvider.get().readAllString( path );
+            final String enumDefinition = ioService.readAllString( path );
             final DataEnumLoader enumLoader = new DataEnumLoader( enumDefinition );
             if ( enumLoader.hasErrors() ) {
                 logger.info( "Unable to index '" + path.toUri().toString() + "'. Related errors follow:" );
@@ -78,8 +77,8 @@ public class EnumFileIndexer implements Indexer {
 
             final String packageName = getPackageName( path );
             final ProjectDataModelOracle dmo = getProjectDataModelOracle( path );
-            final Project project = projectServiceProvider.get().resolveProject( Paths.convert( path ) );
-            final Package pkg = projectServiceProvider.get().resolvePackage( Paths.convert( path ) );
+            final Project project = projectService.resolveProject( Paths.convert( path ) );
+            final Package pkg = projectService.resolvePackage( Paths.convert( path ) );
 
             final DefaultIndexBuilder builder = new DefaultIndexBuilder( project,
                                                                          pkg );
@@ -108,12 +107,12 @@ public class EnumFileIndexer implements Indexer {
 
     //Delegate resolution of package name to method to assist testing
     protected String getPackageName( final Path path ) {
-        return projectServiceProvider.get().resolvePackage( Paths.convert( path ) ).getPackageName();
+        return projectService.resolvePackage( Paths.convert( path ) ).getPackageName();
     }
 
     //Delegate resolution of DMO to method to assist testing
     protected ProjectDataModelOracle getProjectDataModelOracle( final Path path ) {
-        return dataModelServiceProvider.get().getProjectDataModel( Paths.convert( path ) );
+        return dataModelService.getProjectDataModel( Paths.convert( path ) );
     }
 
 }
