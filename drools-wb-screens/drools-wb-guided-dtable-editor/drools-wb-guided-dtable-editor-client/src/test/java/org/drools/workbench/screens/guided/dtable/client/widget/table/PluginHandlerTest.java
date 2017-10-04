@@ -285,6 +285,7 @@ public class PluginHandlerTest {
 
         final BRLActionColumnPlugin plugin = spy(new BRLActionColumnPlugin(ruleModellerPage,
                                                                            new MockInstanceImpl<>(new ArrayList<>()),
+                                                                           new MockInstanceImpl<>(new ArrayList<>()),
                                                                            additionalInfoPage,
                                                                            event,
                                                                            translationService));
@@ -298,6 +299,7 @@ public class PluginHandlerTest {
         final BRLActionColumn originalColumn = mock(BRLActionColumn.class);
 
         final BRLActionColumnPlugin plugin = spy(new BRLActionColumnPlugin(ruleModellerPage,
+                                                                           new MockInstanceImpl<>(new ArrayList<>()),
                                                                            new MockInstanceImpl<>(new ArrayList<>()),
                                                                            additionalInfoPage,
                                                                            event,
@@ -353,7 +355,8 @@ public class PluginHandlerTest {
         final BRLConditionColumnPlugin plugin = spy(new BRLConditionColumnPlugin(ruleModellerPage,
                                                                                  additionalInfoPage,
                                                                                  event,
-                                                                                 translationService));
+                                                                                 translationService,
+                                                                                 new MockInstanceImpl<>(new ArrayList<>())));
 
         doReturn(wizard).when(wizardManagedInstance).get();
         doReturn(plugin).when(brlConditionColumnPlugin).get();

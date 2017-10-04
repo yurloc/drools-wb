@@ -16,6 +16,8 @@
 
 package org.drools.workbench.screens.guided.rule.client.editor.factPattern;
 
+import java.util.stream.Collectors;
+
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -31,8 +33,10 @@ import org.drools.workbench.models.datamodel.rule.HasConstraints;
 import org.drools.workbench.models.datamodel.rule.SingleFieldConstraint;
 import org.drools.workbench.models.datamodel.rule.SingleFieldConstraintEBLeftSide;
 import org.drools.workbench.screens.guided.rule.client.editor.RuleModeller;
+import org.drools.workbench.screens.guided.rule.client.editor.validator.PatternBindingValidatorUtils;
 import org.drools.workbench.screens.guided.rule.client.resources.GuidedRuleEditorResources;
 import org.drools.workbench.screens.guided.rule.client.resources.images.GuidedRuleEditorImages508;
+import org.guvnor.common.services.shared.validation.model.ValidationMessage;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -134,6 +138,12 @@ public class PopupCreator {
                 String var = varName.getText();
                 if (modeller.isVariableNameUsed(var)) {
                     Window.alert(GuidedRuleEditorResources.CONSTANTS.TheVariableName0IsAlreadyTaken(var));
+                    return;
+                }
+                String validationTextToDisplay = PatternBindingValidatorUtils.getValidationTextToDisplay(getModeller().getPatternBindingValidators(),
+                                                                                                         var);
+                if (!validationTextToDisplay.isEmpty()) {
+                    Window.alert(validationTextToDisplay);
                     return;
                 }
                 con.setFieldBinding(var);
@@ -464,6 +474,13 @@ public class PopupCreator {
                         Window.alert(GuidedRuleEditorResources.CONSTANTS.TheVariableName0IsAlreadyTaken(var));
                         return;
                     }
+                    String validationTextToDisplay = PatternBindingValidatorUtils.getValidationTextToDisplay(getModeller().getPatternBindingValidators(),
+                                                                                                             var);
+                    if (!validationTextToDisplay.isEmpty()) {
+                        Window.alert(validationTextToDisplay);
+                        return;
+                    }
+
                     pattern.setBoundName(varTxt.getText());
                     modeller.refreshWidget();
                     popup.hide();

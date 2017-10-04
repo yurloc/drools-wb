@@ -60,6 +60,7 @@ public class RuleModellerTest {
 
         ruleModeller = new RuleModeller(model,
                                         Collections.emptyList(),
+                                        Collections.emptyList(),
                                         oracle,
                                         widgetFactory,
                                         eventBus,

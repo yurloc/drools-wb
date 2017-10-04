@@ -20,6 +20,7 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.gwtmockito.WithClassesToStub;
 import org.drools.workbench.models.datamodel.rule.RuleModel;
 import org.drools.workbench.screens.guided.rule.client.editor.plugin.RuleModellerActionPlugin;
+import org.drools.workbench.screens.guided.rule.client.editor.validator.PatternBindingValidator;
 import org.drools.workbench.screens.guided.rule.model.GuidedEditorContent;
 import org.drools.workbench.screens.guided.rule.service.GuidedRuleEditorService;
 import org.guvnor.common.services.shared.metadata.model.Overview;
@@ -63,6 +64,9 @@ public class GuidedRuleEditorPresenterTest {
 
     @Mock
     private ManagedInstance<RuleModellerActionPlugin> actionPluginInstance;
+
+    @Mock
+    private ManagedInstance<PatternBindingValidator> patternBindingValidatorInstance;
 
     @Mock
     private ImportsWidgetPresenter importsWidgetPresenter;

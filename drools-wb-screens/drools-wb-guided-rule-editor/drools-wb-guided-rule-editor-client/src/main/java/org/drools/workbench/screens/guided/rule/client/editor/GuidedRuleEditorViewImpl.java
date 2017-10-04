@@ -25,6 +25,7 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.SimplePanel;
 import org.drools.workbench.models.datamodel.rule.RuleModel;
 import org.drools.workbench.screens.guided.rule.client.editor.plugin.RuleModellerActionPlugin;
+import org.drools.workbench.screens.guided.rule.client.editor.validator.PatternBindingValidator;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.services.shared.rulename.RuleNamesService;
@@ -49,12 +50,14 @@ public class GuidedRuleEditorViewImpl
     @Override
     public void setContent(final RuleModel model,
                            final Collection<RuleModellerActionPlugin> actionPlugins,
+                           final Collection<PatternBindingValidator> patternBindingValidators,
                            final AsyncPackageDataModelOracle oracle,
                            final Caller<RuleNamesService> ruleNamesService,
                            final boolean isReadOnly,
                            final boolean isDSLEnabled) {
         this.modeller = new RuleModeller(model,
                                          actionPlugins,
+                                         patternBindingValidators,
                                          oracle,
                                          new RuleModellerWidgetFactory(actionPlugins),
                                          localBus,
